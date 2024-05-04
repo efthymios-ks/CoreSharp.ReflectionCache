@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace CoreSharp.ReflectionCache.Models;
 
-public sealed class CachedAttributes : CacheCollectionBase<Attribute>
+public sealed class CachedAttributes : CachedCollectionBase<Attribute>
 {
     // Constructors 
     internal CachedAttributes(MemberInfo memberInfo)

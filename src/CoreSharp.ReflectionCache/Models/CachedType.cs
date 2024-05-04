@@ -10,10 +10,13 @@ public sealed class CachedType
     // Fields
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private static IMemoryCache _cachedTypes = new MemoryCache(new MemoryCacheOptions());
+
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private CachedAttributes _attributes;
+
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private CachedProperties _properties;
+
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private CachedFields _fields;
 
@@ -60,12 +63,13 @@ public sealed class CachedType
 
     public static CachedType Get(Type type, TimeSpan cacheDuration)
     {
-        if (!CachedTypes.TryGetValue<CachedType>(type, out var cachedType))
+        if (CachedTypes.TryGetValue<CachedType>(type, out var cachedType))
         {
-            cachedType = new CachedType(type);
-            CachedTypes.Set(type, cachedType, cacheDuration);
+            return cachedType;
         }
 
+        cachedType = new CachedType(type);
+        CachedTypes.Set(type, cachedType, cacheDuration);
         return cachedType;
     }
 }

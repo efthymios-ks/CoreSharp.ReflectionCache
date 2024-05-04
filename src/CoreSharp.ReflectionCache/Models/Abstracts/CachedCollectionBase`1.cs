@@ -7,10 +7,10 @@ using System.Linq;
 namespace CoreSharp.ReflectionCache.Models.Abstracts;
 
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-public abstract class CacheCollectionBase<TElement> : IReadOnlyCollection<TElement>
+public abstract class CachedCollectionBase<TElement> : IReadOnlyCollection<TElement>
 {
     // Constructors 
-    protected CacheCollectionBase(IEnumerable<TElement> source)
+    protected CachedCollectionBase(IEnumerable<TElement> source)
         => Source = source?.ToArray() ?? Array.Empty<TElement>();
 
     // Properties 
@@ -29,3 +29,4 @@ public abstract class CacheCollectionBase<TElement> : IReadOnlyCollection<TEleme
     IEnumerator IEnumerable.GetEnumerator()
         => GetEnumerator();
 }
+
