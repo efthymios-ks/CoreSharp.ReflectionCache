@@ -99,7 +99,7 @@ public sealed class CachedFieldTests
     }
 
     [Test]
-    public void GetValueGeneric_WhenCalled_ShouldReturnFieldValue()
+    public void GetValue_Generic_WhenCalled_ShouldReturnFieldValue()
     {
         // Arrange 
         var parent = new DummyClass()

@@ -46,7 +46,6 @@ public sealed class CachedPropertiesTests
 
         // Assert
         cachedProperties.Should().NotBeNull();
-        cachedProperties.Should().NotBeEmpty();
         cachedProperties.Should().HaveCount(1);
         cachedProperties.Should().NotContainKey(nameof(DummyClass.Field1));
         cachedProperties.Should().ContainKey(nameof(DummyClass.Property1));
