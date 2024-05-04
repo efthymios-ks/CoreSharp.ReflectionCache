@@ -2,7 +2,6 @@
 using CoreSharp.ReflectionCache.Models;
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 
 namespace Benchmarks;
 
@@ -31,105 +30,125 @@ public partial class BenchmarksContainer
     {
     }
 
+    #region Get constructors
+    [Benchmark]
+    public void GetConstructors_Reflection()
+        => _ = _dummyType.GetConstructors();
+
+    [Benchmark]
+    public void GetConstructors_Cached()
+        => _ = _dummyCachedType.Constructors;
+    #endregion
+
     #region Get attributes
     [Benchmark]
-    public void Reflection_GetAttributes()
+    public void GetAttributes_Reflection()
         => _ = _dummyType.GetCustomAttributes(true);
 
     [Benchmark]
-    public void CachedReflection_GetAttributes()
+    public void GetAttributes_Cached()
         => _ = _dummyCachedType.Attributes;
+    #endregion
+
+    #region Get methods
+    [Benchmark]
+    public void GetMethods_Reflection()
+        => _ = _dummyType.GetMethods();
+
+    [Benchmark]
+    public void GetMethods_Cached()
+        => _ = _dummyCachedType.Methods;
     #endregion
 
     #region Get properties
     [Benchmark]
-    public void Reflection_GetProperties()
-        => _ = _dummyType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+    public void GetProperties_Reflection()
+        => _ = _dummyType.GetProperties();
 
     [Benchmark]
-    public void CachedReflection_GetProperties()
+    public void GetProperties_Cached()
         => _ = _dummyCachedType.Properties;
     #endregion
 
     #region Get fields 
     [Benchmark]
-    public void Reflection_GetFields()
-        => _ = _dummyType.GetFields(BindingFlags.Public | BindingFlags.Instance);
+    public void GetFields_Reflection()
+        => _ = _dummyType.GetFields();
 
     [Benchmark]
-    public void CachedReflection_GetFields()
+    public void GetFields_Cached()
         => _ = _dummyCachedType.Fields;
     #endregion
 
     #region Get property value
     [Benchmark]
-    public void Direct_GetPropertyValue()
-        => _ = _dummy.PropertyWith1Attribute;
+    public void GetPropertyValue_Directly()
+        => _ = _dummy.Property;
 
     [Benchmark]
-    public void Reflection_GetPropertyValue()
+    public void GetPropertyValue_Reflection()
         => _ = _dummyType
-                .GetProperty(nameof(DummyClass.PropertyWith1Attribute))
+                .GetProperty(nameof(DummyClass.Property))
                 .GetValue(_dummy);
 
     [Benchmark]
-    public void CachedReflection_GetPropertyValue()
+    public void GetPropertyValue_Cached()
         => _ = _dummyCachedType
-                .Properties[nameof(DummyClass.PropertyWith1Attribute)]
+                .Properties[nameof(DummyClass.Property)]
                 .GetValue<DummyClass, string>(_dummy);
     #endregion
 
     #region Set property value
     [Benchmark]
-    public void Direct_SetPropertyValue()
-        => _dummy.PropertyWith1Attribute = "1";
+    public void SetPropertyValue_Directly()
+        => _dummy.Property = "1";
 
     [Benchmark]
-    public void Reflection_SetPropertyValue()
+    public void SetPropertyValue_Reflection()
         => _dummyType
-            .GetProperty(nameof(DummyClass.PropertyWith1Attribute))
+            .GetProperty(nameof(DummyClass.Property))
             .SetValue(_dummy, "1");
 
     [Benchmark]
-    public void CachedReflection_SetPropertyValue()
+    public void SetPropertyValue_Cached()
         => _dummyCachedType
-            .Properties[nameof(DummyClass.PropertyWith1Attribute)]
+            .Properties[nameof(DummyClass.Property)]
             .SetValue(_dummy, "1");
     #endregion
 
     #region Get field value 
     [Benchmark]
-    public void Direct_GetFieldValue()
-        => _ = _dummy.FieldWith1Attribute;
+    public void GetFieldValue_Directly()
+        => _ = _dummy.Field;
 
     [Benchmark]
-    public void Reflection_GetFieldValue()
+    public void GetFieldValue_Reflection()
         => _ = _dummyType
-                .GetField(nameof(DummyClass.FieldWith1Attribute))
+                .GetField(nameof(DummyClass.Field))
                 .GetValue(_dummy);
 
     [Benchmark]
-    public void CachedReflection_GetFieldValue()
+    public void GetFieldValue_Cached()
         => _ = _dummyCachedType
-                .Fields[nameof(DummyClass.FieldWith1Attribute)]
+                .Fields[nameof(DummyClass.Field)]
                 .GetValue<string>(_dummy);
     #endregion
 
     #region Set field value 
     [Benchmark]
-    public void Direct_SetFieldValue()
-        => _dummy.FieldWith1Attribute = "1";
+    public void SetFieldValue_Directly()
+        => _dummy.Field = "1";
 
     [Benchmark]
-    public void Reflection_SetFieldValue()
+    public void SetFieldValue_Reflection()
         => _dummyType
-            .GetField(nameof(DummyClass.FieldWith1Attribute))
+            .GetField(nameof(DummyClass.Field))
             .SetValue(_dummy, "1");
 
     [Benchmark]
-    public void CachedReflection_SetFieldValue()
+    public void SetFieldValue_Cached()
         => _dummyCachedType
-            .Fields[nameof(DummyClass.FieldWith1Attribute)]
+            .Fields[nameof(DummyClass.Field)]
             .SetValue(_dummy, "1");
     #endregion
 }

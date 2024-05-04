@@ -1,3 +1,3 @@
 ﻿using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("CoreSharp.ReflectionCache.Tests")]
+[assembly: InternalsVisibleTo("Tests.CoreSharp.ReflectionCache")]
