@@ -234,7 +234,7 @@ public sealed class CachedDictionaryBaseTests
     }
 
     [Test]
-    public void GetEnumeratorGeneric_WhenCalled_ShouldReturnItemsEnumerator()
+    public void GetEnumerator_Generic_WhenCalled_ShouldReturnItemsEnumerator()
     {
         // Arrange
         var source = new Dictionary<string, string>

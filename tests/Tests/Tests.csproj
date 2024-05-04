@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup Label="Package">
-		<AssemblyName>CoreSharp.ReflectionCache.Tests</AssemblyName>
+		<AssemblyName>Tests.CoreSharp.ReflectionCache</AssemblyName>
 		<TargetFramework>net7.0</TargetFramework>
 		<IsPackable>false</IsPackable>
 	</PropertyGroup>

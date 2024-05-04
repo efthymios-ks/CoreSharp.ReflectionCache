@@ -6,7 +6,7 @@ namespace CoreSharp.ReflectionCache.Models;
 
 public sealed class CachedField : CachedMemberBase<FieldInfo>
 {
-    // Fields 
+    // Constructors 
     internal CachedField(FieldInfo fieldInfo)
         : base(fieldInfo)
     {
