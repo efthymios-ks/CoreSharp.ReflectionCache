@@ -12,7 +12,7 @@ namespace Tests.Models;
 public sealed class CachedTypeTests
 {
     [Test]
-    public void GetGeneric_WhenCalled_ShouldReturnCachedType()
+    public void Get_Generic_WhenCalled_ShouldReturnCachedType()
     {
         // Act 
         var cachedType = CachedType.Get<DummyClass>();
@@ -48,7 +48,7 @@ public sealed class CachedTypeTests
     }
 
     [Test]
-    public void GetGeneric_WhenCalledWithCacheDuration_ShouldReturnCachedType()
+    public void Get_Generic_WhenCalledWithCacheDuration_ShouldReturnCachedType()
     {
         // Act 
         var cachedType = CachedType.Get<DummyClass>(TimeSpan.FromTicks(1));
@@ -140,6 +140,26 @@ public sealed class CachedTypeTests
     }
 
     [Test]
+    public void Constructors_WhenCalled_ShouldReturnCachedConstructors()
+    {
+        // Arrange
+        var cachedType = CachedType.Get<DummyClass>();
+
+        // Act 
+        var constructors = cachedType.Constructors;
+
+        // Assert
+        constructors.Should().NotBeNull();
+        constructors.Should().HaveCount(1);
+        var constructor = constructors.First();
+        var parameters = constructor.Parameters;
+        constructors.Should().NotBeNull();
+        constructors.Should().HaveCount(1);
+        var parameter = parameters[0];
+        parameter.ParameterType.Should().Be(typeof(int));
+    }
+
+    [Test]
     public void Attributes_WhenCalled_ShouldReturnCachedAttributes()
     {
         // Arrange
@@ -187,11 +207,42 @@ public sealed class CachedTypeTests
         fields.Should().ContainKey(nameof(DummyClass.Field));
     }
 
+    [Test]
+    public void Methods_WhenCalled_ShouldReturnCachedMethods()
+    {
+        // Arrange
+        var cachedType = CachedType.Get<DummyClass>();
+
+        // Act 
+        var methods = cachedType.Methods;
+
+        // Assert
+        methods.Should().NotBeNull();
+        methods.Should().NotBeEmpty();
+
+        var processMethod = methods.FirstOrDefault(method => method.Name == nameof(DummyClass.Process));
+        processMethod.Should().NotBeNull();
+        processMethod.ReturnType.Should().Be(typeof(string));
+        processMethod.Name.Should().Be(nameof(DummyClass.Process));
+
+        var parameters = processMethod.Parameters;
+        parameters.Should().NotBeNull();
+        parameters.Should().HaveCount(1);
+        var parameter = parameters[0];
+        parameter.ParameterType.Should().Be(typeof(int));
+    }
+
     [Display(Name = "DummyClass_Display")]
     private sealed class DummyClass
     {
         public string Field;
 
+        public DummyClass(int _)
+        {
+        }
+
         public string Property { get; set; }
+        public static string Process(int value)
+            => value.ToString();
     }
 }

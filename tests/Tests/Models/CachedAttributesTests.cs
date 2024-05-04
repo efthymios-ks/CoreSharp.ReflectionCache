@@ -74,7 +74,7 @@ public sealed class CachedAttributesTests
     }
 
     [Test]
-    public void OfTypeGeneric_WhenAttributeExists_ShouldReturnAttribute()
+    public void OfType_Generic_WhenAttributeExists_ShouldReturnAttribute()
     {
         // Arrange
         var propertyInfo = typeof(DummyClass)
@@ -90,7 +90,7 @@ public sealed class CachedAttributesTests
     }
 
     [Test]
-    public void OfTypeGeneric_WhenAttributeDoesNotExist_ShouldReturnNull()
+    public void OfType_Generic_WhenAttributeDoesNotExist_ShouldReturnNull()
     {
         // Arrange
         var propertyInfo = typeof(DummyClass)
@@ -137,7 +137,7 @@ public sealed class CachedAttributesTests
     }
 
     [Test]
-    public void OfTypeAllGeneric_WhenAttributesExist_ShouldReturnAllAttributes()
+    public void OfTypeAll_Generic_WhenAttributesExist_ShouldReturnAllAttributes()
     {
         // Arrange
         var propertyInfo = typeof(DummyClass)
@@ -154,7 +154,7 @@ public sealed class CachedAttributesTests
     }
 
     [Test]
-    public void OfTypeAllGeneric_WhenAttributesDoNotExist_ShouldReturnEmptyArray()
+    public void OfTypeAll_Generic_WhenAttributesDoNotExist_ShouldReturnEmptyArray()
     {
         // Arrange
         var propertyInfo = typeof(DummyClass)

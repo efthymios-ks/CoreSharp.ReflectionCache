@@ -101,7 +101,7 @@ public sealed class CachedCollectionBaseTests
     }
 
     [Test]
-    public void GetEnumeratorGeneric_WhenCalled_ShouldReturnItemsEnumerator()
+    public void GetEnumerator_Generic_WhenCalled_ShouldReturnItemsEnumerator()
     {
         // Arrange
         var source = new int[] { 1, 2, 3, };

@@ -2,11 +2,12 @@
 using FluentAssertions;
 using NUnit.Framework;
 using System;
+using System.Linq;
 
 namespace Tests.Models;
 
 [TestFixture]
-public sealed class CachedFieldsTests
+public sealed class CachedConstructorsTests
 {
     [Test]
     public void Constructor_WhenTypeIsNull_ShouldNotThrowException()
@@ -28,11 +29,11 @@ public sealed class CachedFieldsTests
         Type type = null!;
 
         // Act
-        var cachedFields = new CachedFields(type);
+        var cachedConstructors = new CachedConstructors(type);
 
         // Assert
-        cachedFields.Should().NotBeNull();
-        cachedFields.Should().BeEmpty();
+        cachedConstructors.Should().NotBeNull();
+        cachedConstructors.Should().BeEmpty();
     }
 
     [Test]
@@ -42,18 +43,24 @@ public sealed class CachedFieldsTests
         var type = typeof(DummyClass);
 
         // Act
-        var cachedFields = new CachedFields(type);
+        var cachedConstuctors = new CachedConstructors(type);
 
         // Assert
-        cachedFields.Should().NotBeNull();
-        cachedFields.Should().HaveCount(1);
-        cachedFields.Should().NotContainKey(nameof(DummyClass.Property1));
-        cachedFields.Should().ContainKey(nameof(DummyClass.Field1));
+        cachedConstuctors.Should().NotBeNull();
+        cachedConstuctors.Should().HaveCount(1);
+        var constructor = cachedConstuctors.First();
+        var parameters = constructor.Parameters;
+        parameters.Should().NotBeNull();
+        parameters.Should().HaveCount(1);
+        var parameter = parameters[0];
+        parameter.ParameterType.Should().Be(typeof(int));
+
     }
 
     private sealed class DummyClass
     {
-        public string Field1;
-        public string Property1 { get; set; }
+        public DummyClass(int _)
+        {
+        }
     }
 }

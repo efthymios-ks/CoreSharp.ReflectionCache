@@ -12,6 +12,9 @@ public sealed class CachedType
     private static IMemoryCache _cachedTypes = new MemoryCache(new MemoryCacheOptions());
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private CachedConstructors _constructors;
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private CachedAttributes _attributes;
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -19,6 +22,9 @@ public sealed class CachedType
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private CachedFields _fields;
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private CachedMethods _methods;
 
     // Constructors
     private CachedType(Type type)
@@ -42,6 +48,9 @@ public sealed class CachedType
     public string Name
         => BaseType.Name;
 
+    public CachedConstructors Constructors
+        => _constructors ??= new CachedConstructors(BaseType);
+
     public CachedAttributes Attributes
         => _attributes ??= new CachedAttributes(BaseType);
 
@@ -50,6 +59,9 @@ public sealed class CachedType
 
     public CachedFields Fields
         => _fields ??= new CachedFields(BaseType);
+
+    public CachedMethods Methods
+        => _methods ??= new CachedMethods(BaseType);
 
     // Methods 
     public static CachedType Get<TType>()
