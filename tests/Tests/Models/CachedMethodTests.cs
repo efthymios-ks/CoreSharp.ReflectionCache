@@ -78,7 +78,7 @@ public sealed class CachedMethodTests
         var cachedMethod = new CachedMethod(methodInfo);
 
         // Act
-        var result = cachedMethod.Invoke(parent: null, 1);
+        var result = cachedMethod.Invoke<string>(parent: null, 1);
 
         // Assert 
         result.Should().Be("1");

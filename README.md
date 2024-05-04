@@ -8,9 +8,13 @@
 > Caching utilities for reflection.
 
 ## Features
-- Implementations for `UnitOfWork` and `Repository` pattern.
-- Implementations for `Store` pattern.
-- Track and store `DbContext` changes.
+Cachable members
+- Type
+- Constructors
+- Attributes
+- Properties
+- Fields
+- Methods
 
 ## Installation
 Install the package with [Nuget](https://www.nuget.org/packages/CoreSharp.ReflectionCache/).  
@@ -18,7 +22,7 @@ Install the package with [Nuget](https://www.nuget.org/packages/CoreSharp.Reflec
 dotnet add package CoreSharp.ReflectionCache
 ```
 
-## Use case
+## Use cases
 ```CSharp
 var student = GetStudent();
 var cachedType = ReflectionCache.GetCachedType<Student>();
