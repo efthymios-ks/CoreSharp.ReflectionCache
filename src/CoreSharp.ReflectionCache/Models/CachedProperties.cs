@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace CoreSharp.ReflectionCache.Models;
 
-public sealed class CachedProperties : CacheDictionaryBase<CachedProperty>
+public sealed class CachedProperties : CachedDictionaryBase<CachedProperty>
 {
     // Constructors 
     public CachedProperties(Type type)
@@ -16,8 +16,9 @@ public sealed class CachedProperties : CacheDictionaryBase<CachedProperty>
 
     // Methods 
     private static IReadOnlyDictionary<string, CachedProperty> GetCachedPropertiesDictionary(Type type)
-        => type?.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .ToDictionary(
-                    property => property.Name,
-                    property => new CachedProperty(property));
+        => type
+            ?.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .ToDictionary(
+                property => property.Name,
+                property => new CachedProperty(property));
 }

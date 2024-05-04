@@ -10,6 +10,7 @@ public sealed class CachedProperty : CachedMemberBase<PropertyInfo>
     // Fields  
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private Delegate _getterDelegate;
+
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private Delegate _setterDelegate;
 

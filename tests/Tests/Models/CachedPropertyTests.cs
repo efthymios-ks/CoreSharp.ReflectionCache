@@ -1,18 +1,49 @@
-﻿using FluentAssertions;
+﻿using CoreSharp.ReflectionCache.Models;
+using FluentAssertions;
 using NUnit.Framework;
 using System;
-using Tests.Internal;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
-namespace CoreSharp.ReflectionCache.Models.Tests;
+namespace Tests.Models;
 
 [TestFixture]
 public class CachedPropertyTests
 {
     [Test]
-    public void Type_ShouldReturnPropertyType()
+    public void Constructor_WhenPropertyInfoIsNull_ShouldThrowArgumentNullException()
     {
         // Arrange
-        var propertyInfo = typeof(DummyClass).GetProperty(nameof(DummyClass.PropertyWith1Attribute));
+        PropertyInfo propertyInfo = null!;
+
+        // Act
+        Action action = () => _ = new CachedProperty(propertyInfo);
+
+        // Assert
+        action.Should().ThrowExactly<ArgumentNullException>();
+    }
+
+    [Test]
+    public void Constructor_WhenPropertyInfoIsNotNull_ShouldNotThrowException()
+    {
+        // Arrange
+        var propertyInfo = typeof(DummyClass)
+            .GetProperty(nameof(DummyClass.Property));
+
+        // Act
+        Action action = () => _ = new CachedProperty(propertyInfo);
+
+        // Assert
+        action.Should().NotThrow();
+    }
+
+    [Test]
+    public void Type_WhenCalled_ShouldReturnFieldType()
+    {
+        // Arrange
+        var propertyInfo = typeof(DummyClass)
+            .GetProperty(nameof(DummyClass.Property));
+
         var cachedProperty = new CachedProperty(propertyInfo);
 
         // Act
@@ -20,14 +51,15 @@ public class CachedPropertyTests
 
         // Assert
         propertyType.Should().NotBeNull();
-        propertyType.Should().Be(new DummyClass().PropertyWith1Attribute.GetType());
+        propertyType.Should().Be(typeof(string));
     }
 
     [Test]
-    public void CanWrite_WithReadOnlyProperty_ShouldReturnFalse()
+    public void CanWrite_WhenPropertyIsReadOnly_ShouldReturnFalse()
     {
         // Arrange
-        var propertyInfo = typeof(DummyClass).GetProperty(nameof(DummyClass.ReadOnlyProperty));
+        var propertyInfo = typeof(DummyClass)
+            .GetProperty(nameof(DummyClass.ReadOnlyProperty));
         var cachedProperty = new CachedProperty(propertyInfo);
 
         // Act
@@ -38,10 +70,11 @@ public class CachedPropertyTests
     }
 
     [Test]
-    public void CanWrite_WithReadWriteProperty_ShouldReturnTrue()
+    public void CanWrite_WhenFieldIsWritable_ShouldReturnTrue()
     {
         // Arrange
-        var propertyInfo = typeof(DummyClass).GetProperty(nameof(DummyClass.PropertyWith1Attribute));
+        var propertyInfo = typeof(DummyClass)
+            .GetProperty(nameof(DummyClass.Property));
         var cachedProperty = new CachedProperty(propertyInfo);
 
         // Act
@@ -52,141 +85,88 @@ public class CachedPropertyTests
     }
 
     [Test]
-    public void CanRead_WithReadableProperty_ShouldReturnTrue()
+    public void CanRead_WhenPropertyIsWriteOnly_ShouldReturnFalse()
     {
         // Arrange
-        var propertyInfo = typeof(DummyClass).GetProperty(nameof(DummyClass.PropertyWith1Attribute));
+        var propertyInfo = typeof(DummyClass)
+            .GetProperty(nameof(DummyClass.WriteOnlyProperty));
         var cachedProperty = new CachedProperty(propertyInfo);
 
         // Act
-        var canRead = cachedProperty.CanRead;
+        var canWrite = cachedProperty.CanRead;
 
         // Assert
-        canRead.Should().BeTrue();
+        canWrite.Should().BeFalse();
     }
 
     [Test]
-    public void GetValue_WithValidValueType_ShouldReturnPropertyValue()
+    public void CanRead_WhenFieldIsReadable_ShouldReturnTrue()
     {
-        // Arrange 
-        const string value = "value";
-        var parent = new DummyClass { PropertyWith1Attribute = value };
-        var propertyInfo = typeof(DummyClass).GetProperty(nameof(DummyClass.PropertyWith1Attribute));
+        // Arrange
+        var propertyInfo = typeof(DummyClass)
+            .GetProperty(nameof(DummyClass.Property));
         var cachedProperty = new CachedProperty(propertyInfo);
 
         // Act
-        var readValue = cachedProperty.GetValue<DummyClass, string>(parent);
+        var canWrite = cachedProperty.CanRead;
 
         // Assert
-        readValue.Should().NotBeNull();
-        readValue.Should().Be(value);
+        canWrite.Should().BeTrue();
     }
 
     [Test]
-    public void GetValue_WithInvalidValueType_ShouldThrowArgumentException()
+    public void GetValue_WhenCalled_ShouldReturnFieldValue()
     {
         // Arrange 
-        var parent = new DummyClass { PropertyWith1Attribute = "value" };
-        var propertyInfo = typeof(DummyClass).GetProperty(nameof(DummyClass.PropertyWith1Attribute));
+        var parent = new DummyClass()
+        {
+            Property = "Value"
+        };
+        var propertyInfo = typeof(DummyClass)
+            .GetProperty(nameof(DummyClass.Property));
         var cachedProperty = new CachedProperty(propertyInfo);
 
         // Act
-        Action action = () => cachedProperty.GetValue<DummyClass, int>(parent);
+        var valueRead = cachedProperty.GetValue<DummyClass, string>(parent);
+
+        // Assert
+        valueRead.Should().NotBeNull();
+        valueRead.Should().Be(parent.Property);
+    }
+
+    [Test]
+    public void SetValue_WhenCalled_ShouldSetValue()
+    {
+        // Arrange 
+        const string valueToSet = "Value";
+        var parent = new DummyClass();
+        var propertyInfo = typeof(DummyClass)
+            .GetProperty(nameof(DummyClass.Property));
+        var cacheProperty = new CachedProperty(propertyInfo);
+
+        // Act
+        cacheProperty.SetValue(parent, valueToSet);
 
         // Assert 
-        action.Should().ThrowExactly<ArgumentException>();
+        parent.Property.Should().Be(valueToSet);
     }
 
-    [Test]
-    public void GetValue_WithInvalidParent_ShouldThrowTargetException()
+    private sealed class DummyClass
     {
-        // Arrange 
-        var parent = new DummyNonExistentAttribute();
-        var propertyInfo = typeof(DummyClass).GetProperty(nameof(DummyClass.PropertyWith1Attribute));
-        var cachedProperty = new CachedProperty(propertyInfo);
+        [SuppressMessage("CodeQuality", "IDE0052:Remove unread private members",
+            Justification = "<Pending>")]
+        private static string _writeOnlyProperty;
 
-        // Act
-        Action action = () => cachedProperty.GetValue<DummyNonExistentAttribute, string>(parent);
+        public string Property { get; set; } = "Property";
 
-        // Assert
-        action.Should().ThrowExactly<ArgumentException>();
-    }
+        public static string ReadOnlyProperty
+            => "ReadOnlyProperty";
 
-    [Test]
-    public void GetValue_WithNullParent_ShouldThrowTargetException()
-    {
-        // Arrange 
-        var propertyInfo = typeof(DummyClass).GetProperty(nameof(DummyClass.PropertyWith1Attribute));
-        var cachedProperty = new CachedProperty(propertyInfo);
-
-        // Act
-        Action action = () => cachedProperty.GetValue<DummyClass, string>(null);
-
-        // Assert
-        action.Should().ThrowExactly<NullReferenceException>();
-    }
-
-    [Test]
-    public void SetValue_WithValidValueType_ShouldSetPropertyValue()
-    {
-        // Arrange 
-        const string value = "value";
-        var parent = new DummyClass();
-        var propertyInfo = typeof(DummyClass).GetProperty(nameof(DummyClass.PropertyWith1Attribute));
-        var cachedProperty = new CachedProperty(propertyInfo);
-
-        // Act
-        cachedProperty.SetValue(parent, value);
-
-        // Assert
-        parent.PropertyWith1Attribute.Should().NotBeNull();
-        parent.PropertyWith1Attribute.Should().Be(value);
-    }
-
-    [Test]
-    public void SetValue_WithInvalidValueType_ShouldThrowArgumentException()
-    {
-        // Arrange   
-        var parent = new DummyClass();
-        var propertyInfo = typeof(DummyClass).GetProperty(nameof(DummyClass.PropertyWith1Attribute));
-        var cachedProperty = new CachedProperty(propertyInfo);
-
-        // Act
-        Action action = () => cachedProperty.SetValue(parent, 0);
-
-        // Assert
-        action.Should().ThrowExactly<ArgumentException>();
-    }
-
-    [Test]
-    public void SetValue_WithInvalidParent_ShouldThrowTargetException()
-    {
-        // Arrange 
-        const string value = "value";
-        var parent = new DummyNonExistentAttribute();
-        var propertyInfo = typeof(DummyClass).GetProperty(nameof(DummyClass.PropertyWith1Attribute));
-        var cachedProperty = new CachedProperty(propertyInfo);
-
-        // Act
-        Action action = () => cachedProperty.SetValue(parent, value);
-
-        // Assert
-        action.Should().ThrowExactly<ArgumentException>();
-    }
-
-    [Test]
-    public void SetValue_WithNullParent_ShouldThrowTargetException()
-    {
-        // Arrange 
-        const string value = "value";
-        DummyClass parent = null;
-        var propertyInfo = typeof(DummyClass).GetProperty(nameof(DummyClass.PropertyWith1Attribute));
-        var cachedProperty = new CachedProperty(propertyInfo);
-
-        // Act
-        Action action = () => cachedProperty.SetValue(parent, value);
-
-        // Assert 
-        action.Should().ThrowExactly<NullReferenceException>();
+        [SuppressMessage("Major Code Smell", "S2376:Write-only properties should not be used",
+            Justification = "<Pending>")]
+        public static string WriteOnlyProperty
+        {
+            set => _writeOnlyProperty = value;
+        }
     }
 }

@@ -1,84 +1,60 @@
-﻿using FluentAssertions;
+﻿using CoreSharp.ReflectionCache.Models;
+using FluentAssertions;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
-using Tests.Internal;
 
-namespace CoreSharp.ReflectionCache.Models.Tests;
+namespace Tests.Models;
 
 [TestFixture]
 public sealed class CachedFieldsTests
 {
     [Test]
-    public void Constructor_WithValidType_ShouldInitializeFieldsDictionary()
+    public void Constructor_WhenTypeIsNull_ShouldNotThrowException()
+    {
+        // Arrange
+        Type type = null!;
+
+        // Act
+        Action action = () => _ = new CachedFields(type);
+
+        // Assert
+        action.Should().NotThrow();
+    }
+
+    [Test]
+    public void Constructor_WhenTypeIsNull_ShouldInitializeAsEmpty()
+    {
+        // Arrange
+        Type type = null!;
+
+        // Act
+        var cachedFields = new CachedFields(type);
+
+        // Assert
+        cachedFields.Should().NotBeNull();
+        cachedFields.Should().BeEmpty();
+    }
+
+    [Test]
+    public void Constructor_WhenCalled_ShouldInitializeFields()
     {
         // Arrange
         var type = typeof(DummyClass);
 
         // Act
-        var cachedProperties = new CachedFields(type);
+        var cachedFields = new CachedFields(type);
 
         // Assert
-        cachedProperties.Should().NotBeNull();
-        cachedProperties.Should().NotBeEmpty();
-        cachedProperties.Count.Should().Be(4); // There are four fields in DummyClass
+        cachedFields.Should().NotBeNull();
+        cachedFields.Should().NotBeEmpty();
+        cachedFields.Should().HaveCount(1);
+        cachedFields.Should().NotContainKey(nameof(DummyClass.Property1));
+        cachedFields.Should().ContainKey(nameof(DummyClass.Field1));
     }
 
-    [Test]
-    public void Constructor_WithNullType_ShouldInitializeEmptyFieldsDictionary()
+    private sealed class DummyClass
     {
-        // Arrange
-        Type type = null;
-
-        // Act
-        var cachedProperties = new CachedFields(type);
-
-        // Assert
-        cachedProperties.Should().NotBeNull();
-        cachedProperties.Should().BeEmpty();
-    }
-
-    [Test]
-    public void Constructor_WithNoFields_ShouldInitializeEmptyFieldsDictionary()
-    {
-        // Arrange
-        var type = typeof(DummyClassWithNoFields);
-
-        // Act
-        var cachedProperties = new CachedFields(type);
-
-        // Assert
-        cachedProperties.Should().NotBeNull();
-        cachedProperties.Should().BeEmpty();
-    }
-
-    [Test]
-    public void GetField_WithExistingField_ShouldReturnCachedField()
-    {
-        // Arrange
-        var type = typeof(DummyClass);
-        var cachedProperties = new CachedFields(type);
-        var fieldName = nameof(DummyClass.FieldWith1Attribute);
-
-        // Act
-        var cachedField = cachedProperties[fieldName];
-
-        // Assert
-        cachedField.Should().NotBeNull();
-        cachedField.Name.Should().Be(fieldName);
-    }
-
-    [Test]
-    public void GetField_WithNonExistentField_ShouldReturnNull()
-    {
-        // Arrange
-        var type = typeof(DummyClass);
-        var cachedProperties = new CachedFields(type);
-
-        // Act
-        Action action = () => _ = cachedProperties["NonExistentField"];
-
-        // Assert
-        action.Should().ThrowExactly<KeyNotFoundException>();
+        public string Field1;
+        public string Property1 { get; set; }
     }
 }

@@ -5,10 +5,10 @@ using System.Diagnostics;
 namespace CoreSharp.ReflectionCache.Models.Abstracts;
 
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-public abstract class CacheDictionaryBase<TElement> : IReadOnlyDictionary<string, TElement>
+public abstract class CachedDictionaryBase<TElement> : IReadOnlyDictionary<string, TElement>
 {
     // Constructors 
-    protected CacheDictionaryBase(IReadOnlyDictionary<string, TElement> source)
+    protected CachedDictionaryBase(IReadOnlyDictionary<string, TElement> source)
         => Source = source ?? new Dictionary<string, TElement>();
 
     // Properties 
