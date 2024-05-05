@@ -1,14 +1,11 @@
 ﻿using BenchmarkDotNet.Attributes;
 using CoreSharp.ReflectionCache.Models;
 using System;
-using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace Benchmarks;
 
-[SuppressMessage("Critical Code Smell", "S1186:Methods should not be empty", Justification = "<Pending>")]
-[SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>")]
-[SuppressMessage("Naming", "CA1707:Identifiers should not contain underscores", Justification = "<Pending>")]
-[Config(typeof(BenchmarksContainerConfig))]
+[Config(typeof(BenchmarksConfig))]
 public partial class BenchmarksContainer
 {
     // Fields
@@ -25,130 +22,160 @@ public partial class BenchmarksContainer
         _dummyCachedType = CachedType.Get<DummyClass>();
     }
 
-    [GlobalCleanup]
-    public void GlobalCleanup()
+    // Get constructors
+    [BenchmarkCategory("Get constructors")]
+    [Benchmark(Description = "Reflection", Baseline = true)]
+    public ConstructorInfo[] GetConstructorsReflection()
     {
+        var constructors = _dummyType.GetConstructors();
+        return constructors;
     }
 
-    #region Get constructors
-    [Benchmark]
-    public void GetConstructors_Reflection()
-        => _ = _dummyType.GetConstructors();
+    [BenchmarkCategory("Get constructors")]
+    [Benchmark(Description = "Cached")]
+    public CachedConstructors GetConstructorsCached()
+    {
+        var constructors = _dummyCachedType.Constructors;
+        return constructors;
+    }
 
-    [Benchmark]
-    public void GetConstructors_Cached()
-        => _ = _dummyCachedType.Constructors;
-    #endregion
+    // Get attributes
+    [BenchmarkCategory("Get attributes")]
+    [Benchmark(Description = "Reflection", Baseline = true)]
+    public object[] GetAttributesReflection()
+    {
+        var attributes = _dummyType.GetCustomAttributes(true);
+        return attributes;
+    }
 
-    #region Get attributes
-    [Benchmark]
-    public void GetAttributes_Reflection()
-        => _ = _dummyType.GetCustomAttributes(true);
+    [BenchmarkCategory("Get attributes")]
+    [Benchmark(Description = "Cached")]
+    public CachedAttributes GetAttributesCached()
+    {
+        var attributes = _dummyCachedType.Attributes;
+        return attributes;
+    }
 
-    [Benchmark]
-    public void GetAttributes_Cached()
-        => _ = _dummyCachedType.Attributes;
-    #endregion
+    // Get methods
+    [BenchmarkCategory("Get methods")]
+    [Benchmark(Description = "Reflection", Baseline = true)]
+    public MethodInfo[] GetMethodsReflection()
+    {
+        var methods = _dummyType.GetMethods();
+        return methods;
+    }
 
-    #region Get methods
-    [Benchmark]
-    public void GetMethods_Reflection()
-        => _ = _dummyType.GetMethods();
+    [BenchmarkCategory("Get methods")]
+    [Benchmark(Description = "Cached")]
+    public CachedMethods GetMethodsCached()
+    {
+        var methods = _dummyCachedType.Methods;
+        return methods;
+    }
 
-    [Benchmark]
-    public void GetMethods_Cached()
-        => _ = _dummyCachedType.Methods;
-    #endregion
+    // Get properties
+    [BenchmarkCategory("Get properties")]
+    [Benchmark(Description = "Reflection", Baseline = true)]
+    public PropertyInfo[] GetPropertiesReflection()
+    {
+        var properties = _dummyType.GetProperties();
+        return properties;
+    }
 
-    #region Get properties
-    [Benchmark]
-    public void GetProperties_Reflection()
-        => _ = _dummyType.GetProperties();
+    [BenchmarkCategory("Get properties")]
+    [Benchmark(Description = "Cached")]
+    public CachedProperties GetPropertiesCached()
+    {
+        var properties = _dummyCachedType.Properties;
+        return properties;
+    }
 
-    [Benchmark]
-    public void GetProperties_Cached()
-        => _ = _dummyCachedType.Properties;
-    #endregion
+    // Get fields 
+    [BenchmarkCategory("Get fields")]
+    [Benchmark(Description = "Reflection", Baseline = true)]
+    public FieldInfo[] GetFieldsReflection()
+    {
+        var fields = _dummyType.GetFields();
+        return fields;
+    }
 
-    #region Get fields 
-    [Benchmark]
-    public void GetFields_Reflection()
-        => _ = _dummyType.GetFields();
+    [BenchmarkCategory("Get fields")]
+    [Benchmark(Description = "Cached")]
+    public CachedFields GetFieldsCached()
+    {
+        var fields = _dummyCachedType.Fields;
+        return fields;
+    }
 
-    [Benchmark]
-    public void GetFields_Cached()
-        => _ = _dummyCachedType.Fields;
-    #endregion
+    // Get property value 
+    [BenchmarkCategory("Get property value")]
+    [Benchmark(Description = "Reflection", Baseline = true)]
+    public object GetPropertyValueReflection()
+    {
+        var value = _dummyType
+            .GetProperty(nameof(DummyClass.Property))
+            .GetValue(_dummy);
+        return value;
+    }
 
-    #region Get property value
-    [Benchmark]
-    public void GetPropertyValue_Directly()
-        => _ = _dummy.Property;
+    [BenchmarkCategory("Get property value")]
+    [Benchmark(Description = "Cached")]
+    public string GetPropertyValueCached()
+    {
+        var value = _dummyCachedType
+            .Properties[nameof(DummyClass.Property)]
+            .GetValue<DummyClass, string>(_dummy);
+        return value;
+    }
 
-    [Benchmark]
-    public void GetPropertyValue_Reflection()
-        => _ = _dummyType
-                .GetProperty(nameof(DummyClass.Property))
-                .GetValue(_dummy);
-
-    [Benchmark]
-    public void GetPropertyValue_Cached()
-        => _ = _dummyCachedType
-                .Properties[nameof(DummyClass.Property)]
-                .GetValue<DummyClass, string>(_dummy);
-    #endregion
-
-    #region Set property value
-    [Benchmark]
-    public void SetPropertyValue_Directly()
-        => _dummy.Property = "1";
-
-    [Benchmark]
-    public void SetPropertyValue_Reflection()
+    // Set property value 
+    [BenchmarkCategory("Set property value")]
+    [Benchmark(Description = "Reflection", Baseline = true)]
+    public void SetPropertyValueReflection()
         => _dummyType
             .GetProperty(nameof(DummyClass.Property))
             .SetValue(_dummy, "1");
 
-    [Benchmark]
-    public void SetPropertyValue_Cached()
+    [BenchmarkCategory("Set property value")]
+    [Benchmark(Description = "Cached")]
+    public void SetPropertyValueCached()
         => _dummyCachedType
             .Properties[nameof(DummyClass.Property)]
             .SetValue(_dummy, "1");
-    #endregion
 
-    #region Get field value 
-    [Benchmark]
-    public void GetFieldValue_Directly()
-        => _ = _dummy.Field;
+    // Get field value  
+    [BenchmarkCategory("Get field value")]
+    [Benchmark(Description = "Reflection", Baseline = true)]
+    public object GetFieldValueReflection()
+    {
+        var value = _ = _dummyType
+            .GetField(nameof(DummyClass.Field))
+            .GetValue(_dummy);
+        return value;
+    }
 
-    [Benchmark]
-    public void GetFieldValue_Reflection()
-        => _ = _dummyType
-                .GetField(nameof(DummyClass.Field))
-                .GetValue(_dummy);
+    [BenchmarkCategory("Get field value")]
+    [Benchmark(Description = "Cached")]
+    public string GetFieldValueCached()
+    {
+        var value = _dummyCachedType
+            .Fields[nameof(DummyClass.Field)]
+            .GetValue<string>(_dummy);
+        return value;
+    }
 
-    [Benchmark]
-    public void GetFieldValue_Cached()
-        => _ = _dummyCachedType
-                .Fields[nameof(DummyClass.Field)]
-                .GetValue<string>(_dummy);
-    #endregion
-
-    #region Set field value 
-    [Benchmark]
-    public void SetFieldValue_Directly()
-        => _dummy.Field = "1";
-
-    [Benchmark]
-    public void SetFieldValue_Reflection()
+    // Set field value  
+    [BenchmarkCategory("Set field value")]
+    [Benchmark(Description = "Reflection", Baseline = true)]
+    public void SetFieldValueReflection()
         => _dummyType
             .GetField(nameof(DummyClass.Field))
             .SetValue(_dummy, "1");
 
-    [Benchmark]
-    public void SetFieldValue_Cached()
+    [BenchmarkCategory("Set field value")]
+    [Benchmark(Description = "Cached")]
+    public void SetFieldValueCached()
         => _dummyCachedType
             .Fields[nameof(DummyClass.Field)]
             .SetValue(_dummy, "1");
-    #endregion
 }
