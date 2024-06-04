@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup Label="Package">
+		<AssemblyName>CoreSharp.ReflectionCache.Tests</AssemblyName>
+	</PropertyGroup>
+
+	<ItemGroup Label="Project references">
+		<ProjectReference Include="..\CoreSharp.ReflectionCache\CoreSharp.ReflectionCache.csproj" />
+	</ItemGroup>
+
+	<ItemGroup Label="Package references">
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+	</ItemGroup>
+
+</Project>

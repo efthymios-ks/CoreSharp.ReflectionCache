@@ -40,14 +40,14 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           ./.sonar/scanner/dotnet-sonarscanner begin /k:"efthymios-ks_CoreSharp.ReflectionCache" /o:"efthymios-ks" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
-          dotnet build ./src/CoreSharp.ReflectionCache/CoreSharp.ReflectionCache.csproj --no-incremental
+          dotnet build ./CoreSharp.ReflectionCache/CoreSharp.ReflectionCache.csproj --no-incremental
           ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
       - name: Test coverage
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          ./.sonar/scanner/dotnet-sonarscanner begin /k:"efthymios-ks_CoreSharp.ReflectionCache" /o:"efthymios-ks" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.coverage.inclusions="./src/CoreSharp.ReflectionCache/**/*.cs" /d:sonar.cs.opencover.reportsPaths=coverage.xml
+          ./.sonar/scanner/dotnet-sonarscanner begin /k:"efthymios-ks_CoreSharp.ReflectionCache" /o:"efthymios-ks" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.coverage.inclusions="./CoreSharp.ReflectionCache/**/*.cs" /d:sonar.cs.opencover.reportsPaths=coverage.xml
           dotnet tool install coverlet.console --global
-          dotnet build tests/Tests/Tests.csproj --no-incremental
-          coverlet ./tests/Tests/bin/Debug/**/Tests.CoreSharp.ReflectionCache.dll --target "dotnet" --targetargs "test --no-build" -f=opencover -o="coverage.xml"
+          dotnet build CoreSharp.ReflectionCache.Tests/CoreSharp.ReflectionCache.Tests.csproj --no-incremental
+          coverlet CoreSharp.ReflectionCache.Tests/bin/Debug/**/CoreSharp.ReflectionCache.Tests.dll --target "dotnet" --targetargs "test --no-build" -f=opencover -o="coverage.xml"
           ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
