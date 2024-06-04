@@ -9,7 +9,7 @@
 
 ## Features
 Cachable members
-- Type
+- Types
 - Constructors
 - Attributes
 - Properties
