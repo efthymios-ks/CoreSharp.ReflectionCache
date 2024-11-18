@@ -65,13 +65,17 @@ public sealed class CachedType
     public static CachedType Get<TType>()
         => Get(typeof(TType));
 
-    public static CachedType Get(Type? type)
-        => Get(type, TimeSpan.FromMinutes(15));
+    public static CachedType Get(Type type)
+    {
+        ArgumentNullException.ThrowIfNull(type);
+
+        return Get(type, TimeSpan.FromMinutes(15));
+    }
 
     public static CachedType Get<TType>(TimeSpan cacheDuration)
         => Get(typeof(TType), cacheDuration);
 
-    public static CachedType Get(Type? type, TimeSpan cacheDuration)
+    public static CachedType Get(Type type, TimeSpan cacheDuration)
     {
         ArgumentNullException.ThrowIfNull(type);
 

@@ -23,7 +23,7 @@ public sealed class CachedTypeTests
     public void Get_WhenTypeIsNull_ShouldThrowArgumentNullException()
     {
         // Arrange
-        Type? type = null;
+        Type? type = null!;
 
         // Act 
         Action action = () => _ = CachedType.Get(type);
@@ -56,10 +56,10 @@ public sealed class CachedTypeTests
     }
 
     [Test]
-    public void Get_WhenCalledWithDurationTypeIsNull_ShouldThrowArgumentNullException()
+    public void Get_WhenCalledWithDurationAndTypeIsNull_ShouldThrowArgumentNullException()
     {
         // Arrange
-        Type? type = null;
+        Type? type = null!;
 
         // Act 
         Action action = () => _ = CachedType.Get(type, TimeSpan.FromTicks(1));
