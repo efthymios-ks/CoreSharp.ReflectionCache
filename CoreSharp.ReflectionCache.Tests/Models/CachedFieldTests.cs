@@ -1,27 +1,25 @@
 ﻿using CoreSharp.ReflectionCache.Models;
-using FluentAssertions;
-using NUnit.Framework;
 using System.Reflection;
 
-namespace Tests.Models;
+namespace CoreSharp.ReflectionCache.Tests.Models;
 
-[TestFixture]
 public sealed class CachedFieldTests
 {
-    [Test]
+    [Fact]
     public void Constructor_WhenFieldInfoIsNull_ShouldThrowArgumentNullException()
     {
         // Arrange
         FieldInfo? fieldInfo = null;
 
         // Act
-        Action action = () => _ = new CachedField(fieldInfo);
+        void Action()
+            => _ = new CachedField(fieldInfo);
 
         // Assert
-        action.Should().ThrowExactly<ArgumentNullException>();
+        Assert.Throws<ArgumentNullException>(Action);
     }
 
-    [Test]
+    [Fact]
     public void Constructor_WhenFieldInfoIsNotNull_ShouldNotThrowException()
     {
         // Arrange
@@ -29,13 +27,15 @@ public sealed class CachedFieldTests
             .GetField(nameof(DummyClass.Field));
 
         // Act
-        Action action = () => _ = new CachedField(fieldInfo);
+        void Action()
+            => _ = new CachedField(fieldInfo);
 
         // Assert
-        action.Should().NotThrow();
+        var exception = Record.Exception(Action);
+        Assert.Null(exception);
     }
 
-    [Test]
+    [Fact]
     public void Type_WhenCalled_ShouldReturnFieldType()
     {
         // Arrange
@@ -48,11 +48,11 @@ public sealed class CachedFieldTests
         var fieldType = cachedField.Type;
 
         // Assert
-        fieldType.Should().NotBeNull();
-        fieldType.Should().Be(typeof(string));
+        Assert.NotNull(fieldType);
+        Assert.Equal(typeof(string), fieldType);
     }
 
-    [Test]
+    [Fact]
     public void CanWrite_WhenFieldIsConst_ShouldReturnFalse()
     {
         // Arrange
@@ -64,10 +64,10 @@ public sealed class CachedFieldTests
         var canWrite = cachedField.CanWrite;
 
         // Assert
-        canWrite.Should().BeFalse();
+        Assert.False(canWrite);
     }
 
-    [Test]
+    [Fact]
     public void CanWrite_WhenFieldIsReadOnly_ShouldReturnFalse()
     {
         // Arrange
@@ -79,10 +79,10 @@ public sealed class CachedFieldTests
         var canWrite = cachedField.CanWrite;
 
         // Assert
-        canWrite.Should().BeFalse();
+        Assert.False(canWrite);
     }
 
-    [Test]
+    [Fact]
     public void CanWrite_WhenFieldIsReadWrite_ShouldReturnTrue()
     {
         // Arrange
@@ -94,10 +94,10 @@ public sealed class CachedFieldTests
         var canWrite = cachedField.CanWrite;
 
         // Assert
-        canWrite.Should().BeTrue();
+        Assert.True(canWrite);
     }
 
-    [Test]
+    [Fact]
     public void GetValue_Generic_WhenCalled_ShouldReturnFieldValue()
     {
         // Arrange 
@@ -113,11 +113,11 @@ public sealed class CachedFieldTests
         var valueRead = cachedField.GetValue<string>(parent);
 
         // Assert
-        valueRead.Should().NotBeNull();
-        valueRead.Should().Be(parent.Field);
+        Assert.NotNull(valueRead);
+        Assert.Equal(parent.Field, valueRead);
     }
 
-    [Test]
+    [Fact]
     public void GetValue_WhenCalled_ShouldReturnFieldValue()
     {
         // Arrange 
@@ -133,12 +133,12 @@ public sealed class CachedFieldTests
         var valueRead = cachedField.GetValue(parent);
 
         // Assert
-        valueRead.Should().NotBeNull();
-        var valueReadAsString = valueRead.Should().BeOfType<string>().Subject;
-        valueReadAsString.Should().Be(parent.Field);
+        Assert.NotNull(valueRead);
+        var valueReadAsString = Assert.IsType<string>(valueRead);
+        Assert.Equal(parent.Field, valueReadAsString);
     }
 
-    [Test]
+    [Fact]
     public void SetValue_WhenCalled_ShouldSetValue()
     {
         // Arrange 
@@ -152,7 +152,7 @@ public sealed class CachedFieldTests
         cachedField.SetValue(parent, valueToSet);
 
         // Assert 
-        parent.Field.Should().Be(valueToSet);
+        Assert.Equal(valueToSet, parent.Field);
     }
 
     private sealed class DummyClass

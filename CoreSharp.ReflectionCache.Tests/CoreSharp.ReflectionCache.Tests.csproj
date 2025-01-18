@@ -6,10 +6,14 @@
 
 	<ItemGroup Label="Project references">
 		<ProjectReference Include="..\CoreSharp.ReflectionCache\CoreSharp.ReflectionCache.csproj" />
+		<ProjectReference Include="..\Tests.Common\Tests.Common.csproj" />
 	</ItemGroup>
 
 	<ItemGroup Label="Package references">
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0">
+			<TreatAsUsed>true</TreatAsUsed>
+		</PackageReference>
 	</ItemGroup>
 
 </Project>

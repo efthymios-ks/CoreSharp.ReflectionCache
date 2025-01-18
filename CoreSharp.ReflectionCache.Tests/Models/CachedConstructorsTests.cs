@@ -1,26 +1,25 @@
 ﻿using CoreSharp.ReflectionCache.Models;
-using FluentAssertions;
-using NUnit.Framework;
 
-namespace Tests.Models;
+namespace CoreSharp.ReflectionCache.Tests.Models;
 
-[TestFixture]
 public sealed class CachedConstructorsTests
 {
-    [Test]
+    [Fact]
     public void Constructor_WhenTypeIsNull_ShouldNotThrowException()
     {
         // Arrange
         Type? type = null;
 
         // Act
-        Action action = () => _ = new CachedConstructors(type);
+        void Action()
+            => _ = new CachedConstructors(type);
 
         // Assert
-        action.Should().NotThrow();
+        var exception = Record.Exception(Action);
+        Assert.Null(exception);
     }
 
-    [Test]
+    [Fact]
     public void Constructor_WhenTypeIsNull_ShouldInitializeAsEmpty()
     {
         // Arrange
@@ -30,11 +29,11 @@ public sealed class CachedConstructorsTests
         var cachedConstructors = new CachedConstructors(type);
 
         // Assert
-        cachedConstructors.Should().NotBeNull();
-        cachedConstructors.Should().BeEmpty();
+        Assert.NotNull(cachedConstructors);
+        Assert.Empty(cachedConstructors);
     }
 
-    [Test]
+    [Fact]
     public void Constructor_WhenCalled_ShouldInitializeFields()
     {
         // Arrange
@@ -44,15 +43,14 @@ public sealed class CachedConstructorsTests
         var cachedConstuctors = new CachedConstructors(type);
 
         // Assert
-        cachedConstuctors.Should().NotBeNull();
-        cachedConstuctors.Should().HaveCount(1);
+        Assert.NotNull(cachedConstuctors);
+        Assert.Single(cachedConstuctors);
         var constructor = cachedConstuctors.First();
         var parameters = constructor.Parameters;
-        parameters.Should().NotBeNull();
-        parameters.Should().HaveCount(1);
+        Assert.NotNull(parameters);
+        Assert.Single(parameters);
         var parameter = parameters[0];
-        parameter.ParameterType.Should().Be(typeof(int));
-
+        Assert.Equal(typeof(int), parameter.ParameterType);
     }
 
     private sealed class DummyClass(int _)

@@ -1,41 +1,40 @@
 ﻿using CoreSharp.ReflectionCache.Models.Abstracts;
-using FluentAssertions;
-using NUnit.Framework;
 using System.Collections;
 using System.Reflection;
 
-namespace Models.Abstracts.Tests;
+namespace CoreSharp.ReflectionCache.Tests.Models.Abstracts;
 
-[TestFixture]
 public sealed class CachedCollectionBaseTests
 {
-    [Test]
+    [Fact]
     public void Constructor_WhenSourceIsNotNull_ShouldBeInitializedFromSource()
     {
         // Arrange
-        var source = new[] { 1, 2, 3 };
+        var source = new int[] { 1, 2, 3 };
 
         // Act
         var cachedCollection = new DummyCachedCollection(source);
 
         // Assert
-        cachedCollection.Should().BeEquivalentTo(source);
+        Assert.Equivalent(source, cachedCollection);
     }
 
-    [Test]
+    [Fact]
     public void Constructor_WhenSourceIsNull_ShouldNotThrow()
     {
         // Arrange
         IEnumerable<int>? source = null;
 
         // Act
-        Action action = () => _ = new DummyCachedCollection(source);
+        void Action()
+            => _ = new DummyCachedCollection(source);
 
         // Assert
-        action.Should().NotThrow();
+        var exception = Record.Exception(Action);
+        Assert.Null(exception);
     }
 
-    [Test]
+    [Fact]
     public void Constructor_WhenSourceIsNull_ShouldBeInitializedAsEmpty()
     {
         // Arrange
@@ -45,33 +44,33 @@ public sealed class CachedCollectionBaseTests
         var cachedCollection = new DummyCachedCollection(source);
 
         // Assert
-        cachedCollection.Should().NotBeNull();
-        cachedCollection.Should().BeEmpty();
+        Assert.NotNull(cachedCollection);
+        Assert.Empty(cachedCollection);
     }
 
-    [Test]
+    [Fact]
     public void DebuggerDisplay_WhenCalled_ShouldReturnCount()
     {
         // Arrange
-        var source = new[] { 1, 2, 3 };
+        var source = new int[] { 1, 2, 3 };
         var cachedCollection = new DummyCachedCollection(source);
 
         // Act
         var debuggerDisplay = (string?)cachedCollection
             .GetType()
-            .BaseType
-            !.GetProperty("DebuggerDisplay", BindingFlags.NonPublic | BindingFlags.Instance)
+            .BaseType!
+            .GetProperty("DebuggerDisplay", BindingFlags.NonPublic | BindingFlags.Instance)
             ?.GetValue(cachedCollection);
 
         // Assert
-        debuggerDisplay.Should().Be("Count=3");
+        Assert.Equal("Count=3", debuggerDisplay);
     }
 
-    [Test]
+    [Fact]
     public void Source_WhenCalled_ShouldReturnItems()
     {
         // Arrange
-        var source = new int[] { 1, 2, 3, };
+        var source = new[] { 1, 2, 3 };
         var cachedCollection = new DummyCachedCollection(source);
 
         // Act
@@ -81,28 +80,28 @@ public sealed class CachedCollectionBaseTests
             ?.GetValue(cachedCollection);
 
         // Assert
-        sourceRead.Should().BeEquivalentTo(source);
+        Assert.Equivalent(source, sourceRead);
     }
 
-    [Test]
+    [Fact]
     public void Count_WhenCalled_ShouldReturnItemCount()
     {
         // Arrange
-        var source = new int[] { 1, 2, 3, };
+        var source = new[] { 1, 2, 3 };
         var cachedCollection = new DummyCachedCollection(source);
 
         // Act
         var count = cachedCollection.Count;
 
         // Assert
-        count.Should().Be(source.Length);
+        Assert.Equal(source.Length, count);
     }
 
-    [Test]
+    [Fact]
     public void GetEnumerator_Generic_WhenCalled_ShouldReturnItemsEnumerator()
     {
         // Arrange
-        var source = new int[] { 1, 2, 3, };
+        var source = new[] { 1, 2, 3 };
         var cachedCollection = new DummyCachedCollection(source);
 
         // Act
@@ -114,15 +113,15 @@ public sealed class CachedCollectionBaseTests
         }
 
         // Assert
-        enumerator.Should().NotBeNull();
-        enumeratorItems.Should().BeEquivalentTo(source);
+        Assert.NotNull(enumerator);
+        Assert.Equivalent(source, enumeratorItems);
     }
 
-    [Test]
+    [Fact]
     public void GetEnumerator_WhenCalled_ShouldReturnItemsEnumerator()
     {
         // Arrange
-        var source = new int[] { 1, 2, 3, };
+        var source = new[] { 1, 2, 3 };
         var cachedCollection = new DummyCachedCollection(source);
 
         // Act
@@ -134,8 +133,8 @@ public sealed class CachedCollectionBaseTests
         }
 
         // Assert
-        enumerator.Should().NotBeNull();
-        enumeratorItems.Should().BeEquivalentTo(source);
+        Assert.NotNull(enumerator);
+        Assert.Equivalent(source, enumeratorItems);
     }
 
     private sealed class DummyCachedCollection(IEnumerable<int>? source)

@@ -1,15 +1,13 @@
 ﻿using CoreSharp.ReflectionCache.Models;
-using FluentAssertions;
-using NUnit.Framework;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
-namespace Tests.Models;
+namespace CoreSharp.ReflectionCache.Tests.Models;
 
-[TestFixture]
 public sealed class CachedAttributesTests
 {
-    [Test]
+    [Fact]
     public void Constructor_WhenMemberInfoIsNotNull_ShouldInitializeAttributes()
     {
         // Arrange
@@ -20,13 +18,13 @@ public sealed class CachedAttributesTests
         var cachedAttributes = new CachedAttributes(memberInfo);
 
         // Assert
-        cachedAttributes.Should().NotBeNull();
-        cachedAttributes.Should().HaveCount(1);
-        var displayAttribute = cachedAttributes.First().Should().BeOfType<DisplayAttribute>().Subject;
-        displayAttribute.Name.Should().Be("PropertyWithAttributes_Display");
+        Assert.NotNull(cachedAttributes);
+        Assert.Single(cachedAttributes);
+        var displayAttribute = Assert.IsType<DisplayAttribute>(cachedAttributes.First());
+        Assert.Equal("PropertyWithAttributes_Display", displayAttribute.Name);
     }
 
-    [Test]
+    [Fact]
     public void Constructor_WhenMemberInfoIsNull_ShouldInitializeEmptyAttributes()
     {
         // Arrange
@@ -36,11 +34,11 @@ public sealed class CachedAttributesTests
         var cachedAttributes = new CachedAttributes(memberInfo);
 
         // Assert
-        cachedAttributes.Should().NotBeNull();
-        cachedAttributes.Should().BeEmpty();
+        Assert.NotNull(cachedAttributes);
+        Assert.Empty(cachedAttributes);
     }
 
-    [Test]
+    [Fact]
     public void Constructor_WhenAttributesIsNotNull_ShouldInitializeAttributes()
     {
         // Arrange
@@ -51,13 +49,13 @@ public sealed class CachedAttributesTests
         var cachedAttributes = new CachedAttributes(attributes);
 
         // Assert
-        cachedAttributes.Should().NotBeNull();
-        cachedAttributes.Should().HaveCount(1);
+        Assert.NotNull(cachedAttributes);
+        Assert.Single(cachedAttributes);
         var attribute = cachedAttributes.First();
-        attribute.Should().Be(displayAttribute);
+        Assert.Equal(displayAttribute, attribute);
     }
 
-    [Test]
+    [Fact]
     public void Constructor_WhenAttributesIsNull_ShouldInitializeEmptyAttributes()
     {
         // Arrange
@@ -67,11 +65,11 @@ public sealed class CachedAttributesTests
         var cachedAttributes = new CachedAttributes(attributes);
 
         // Assert
-        cachedAttributes.Should().NotBeNull();
-        cachedAttributes.Should().BeEmpty();
+        Assert.NotNull(cachedAttributes);
+        Assert.Empty(cachedAttributes);
     }
 
-    [Test]
+    [Fact]
     public void OfType_Generic_WhenAttributeExists_ShouldReturnAttribute()
     {
         // Arrange
@@ -83,11 +81,11 @@ public sealed class CachedAttributesTests
         var displayAttribute = cachedAttributes.OfType<DisplayAttribute>();
 
         // Assert
-        displayAttribute.Should().NotBeNull();
-        displayAttribute!.Name.Should().Be("PropertyWithAttributes_Display");
+        Assert.NotNull(displayAttribute);
+        Assert.Equal("PropertyWithAttributes_Display", displayAttribute!.Name);
     }
 
-    [Test]
+    [Fact]
     public void OfType_Generic_WhenAttributeDoesNotExist_ShouldReturnNull()
     {
         // Arrange
@@ -99,10 +97,10 @@ public sealed class CachedAttributesTests
         var debuggerDisplayAttribute = cachedAttributes.OfType<DescriptionAttribute>();
 
         // Assert
-        debuggerDisplayAttribute.Should().BeNull();
+        Assert.Null(debuggerDisplayAttribute);
     }
 
-    [Test]
+    [Fact]
     public void OfType_WhenAttributeExists_ShouldReturnAttribute()
     {
         // Arrange
@@ -114,12 +112,12 @@ public sealed class CachedAttributesTests
         var attribute = cachedAttributes.OfType(typeof(DisplayAttribute));
 
         // Assert
-        attribute.Should().NotBeNull();
-        var displayAttribute = attribute.Should().BeOfType<DisplayAttribute>().Subject;
-        displayAttribute.Name.Should().Be("PropertyWithAttributes_Display");
+        Assert.NotNull(attribute);
+        var displayAttribute = Assert.IsType<DisplayAttribute>(attribute);
+        Assert.Equal("PropertyWithAttributes_Display", displayAttribute.Name);
     }
 
-    [Test]
+    [Fact]
     public void OfType_WhenAttributeDoesNotExist_ShouldReturnNull()
     {
         // Arrange
@@ -131,10 +129,10 @@ public sealed class CachedAttributesTests
         var debuggerDisplayAttribute = cachedAttributes.OfType(typeof(DescriptionAttribute));
 
         // Assert
-        debuggerDisplayAttribute.Should().BeNull();
+        Assert.Null(debuggerDisplayAttribute);
     }
 
-    [Test]
+    [Fact]
     public void OfTypeAll_Generic_WhenAttributesExist_ShouldReturnAllAttributes()
     {
         // Arrange
@@ -146,12 +144,12 @@ public sealed class CachedAttributesTests
         var displayAttributes = cachedAttributes.OfTypeAll<DisplayAttribute>();
 
         // Assert
-        displayAttributes.Should().NotBeEmpty();
-        displayAttributes.Should().HaveCount(1);
-        displayAttributes[0].Name.Should().Be("PropertyWithAttributes_Display");
+        Assert.NotEmpty(displayAttributes);
+        Assert.Single(displayAttributes);
+        Assert.Equal("PropertyWithAttributes_Display", displayAttributes[0].Name);
     }
 
-    [Test]
+    [Fact]
     public void OfTypeAll_Generic_WhenAttributesDoNotExist_ShouldReturnEmptyArray()
     {
         // Arrange
@@ -163,10 +161,10 @@ public sealed class CachedAttributesTests
         var nonExistentAttributes = cachedAttributes.OfTypeAll<DescriptionAttribute>();
 
         // Assert
-        nonExistentAttributes.Should().BeEmpty();
+        Assert.Empty(nonExistentAttributes);
     }
 
-    [Test]
+    [Fact]
     public void OfTypeAll_WhenAttributesExist_ShouldReturnAllAttributes()
     {
         // Arrange
@@ -178,13 +176,13 @@ public sealed class CachedAttributesTests
         var displayAttributes = cachedAttributes.OfTypeAll(typeof(DisplayAttribute));
 
         // Assert
-        displayAttributes.Should().NotBeEmpty();
-        displayAttributes.Should().HaveCount(1);
-        var displayAttribute = displayAttributes[0].Should().BeOfType<DisplayAttribute>().Subject;
-        displayAttribute.Name.Should().Be("PropertyWithAttributes_Display");
+        Assert.NotEmpty(displayAttributes);
+        Assert.Single(displayAttributes);
+        var displayAttribute = Assert.IsType<DisplayAttribute>(displayAttributes[0]);
+        Assert.Equal("PropertyWithAttributes_Display", displayAttribute.Name);
     }
 
-    [Test]
+    [Fact]
     public void OfTypeAll_WhenAttributesDoNotExist_ShouldReturnEmptyArray()
     {
         // Arrange
@@ -196,7 +194,7 @@ public sealed class CachedAttributesTests
         var nonExistentAttributes = cachedAttributes.OfTypeAll(typeof(DescriptionAttribute));
 
         // Assert
-        nonExistentAttributes.Should().BeEmpty();
+        Assert.Empty(nonExistentAttributes);
     }
 
     private sealed class DummyClass

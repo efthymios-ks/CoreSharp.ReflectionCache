@@ -1,26 +1,25 @@
 ﻿using CoreSharp.ReflectionCache.Models;
-using FluentAssertions;
-using NUnit.Framework;
 
-namespace Tests.Models;
+namespace CoreSharp.ReflectionCache.Tests.Models;
 
-[TestFixture]
 public sealed class CachedMethodsTests
 {
-    [Test]
+    [Fact]
     public void Constructor_WhenTypeIsNull_ShouldNotThrowException()
     {
         // Arrange
         Type? type = null;
 
         // Act
-        Action action = () => _ = new CachedMethods(type);
+        void Action()
+            => _ = new CachedMethods(type);
 
         // Assert
-        action.Should().NotThrow();
+        var exception = Record.Exception(Action);
+        Assert.Null(exception);
     }
 
-    [Test]
+    [Fact]
     public void Constructor_WhenTypeIsNull_ShouldInitializeAsEmpty()
     {
         // Arrange
@@ -30,11 +29,11 @@ public sealed class CachedMethodsTests
         var cachedMethods = new CachedMethods(type);
 
         // Assert
-        cachedMethods.Should().NotBeNull();
-        cachedMethods.Should().BeEmpty();
+        Assert.NotNull(cachedMethods);
+        Assert.Empty(cachedMethods);
     }
 
-    [Test]
+    [Fact]
     public void Constructor_WhenCalled_ShouldInitializeFields()
     {
         // Arrange
@@ -44,17 +43,17 @@ public sealed class CachedMethodsTests
         var cachedMethods = new CachedMethods(type);
 
         // Assert
-        cachedMethods.Should().NotBeNull();
+        Assert.NotNull(cachedMethods);
         var processMethod = cachedMethods.FirstOrDefault(method => method.Name == nameof(DummyClass.Process));
-        processMethod.Should().NotBeNull();
-        processMethod!.ReturnType.Should().Be(typeof(string));
-        processMethod.Name.Should().Be(nameof(DummyClass.Process));
+        Assert.NotNull(processMethod);
+        Assert.Equal(typeof(string), processMethod!.ReturnType);
+        Assert.Equal(nameof(DummyClass.Process), processMethod.Name);
 
         var parameters = processMethod.Parameters;
-        parameters.Should().NotBeNull();
-        parameters.Should().HaveCount(1);
+        Assert.NotNull(parameters);
+        Assert.Single(parameters);
         var parameter = parameters[0];
-        parameter.ParameterType.Should().Be(typeof(int));
+        Assert.Equal(typeof(int), parameter.ParameterType);
     }
 
     private static class DummyClass

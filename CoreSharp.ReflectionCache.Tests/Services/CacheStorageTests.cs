@@ -1,28 +1,26 @@
 ﻿using CoreSharp.ReflectionCache.Services;
-using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
-using NSubstitute;
-using NUnit.Framework;
 
-namespace Tests.Services;
+namespace CoreSharp.ReflectionCache.Tests.Services;
 
-[TestFixture]
 public sealed class CacheStorageTests
 {
-    [Test]
+    [Fact]
     public void Constructor_WhenCalled_ShouldNotThrow()
     {
         // Arrange
         var memoryCache = Substitute.For<IMemoryCache>();
 
         // Act
-        Action action = () => _ = new CacheStorage(memoryCache);
+        void Action()
+            => _ = new CacheStorage(memoryCache);
 
         // Assert
-        action.Should().NotThrow();
+        var exception = Record.Exception(Action);
+        Assert.Null(exception);
     }
 
-    [Test]
+    [Fact]
     public void GetOrAdd_WhenItemExists_ReturnExisting()
     {
         // Arrange
@@ -40,21 +38,21 @@ public sealed class CacheStorageTests
 
         const int valueFactoryResult = cachedValue + 1;
         var valueFactoredCalled = false;
-        Func<int> valueFactory = () =>
+        int ValueFactory()
         {
             valueFactoredCalled = true;
             return valueFactoryResult;
-        };
+        }
 
         // Act 
-        var result = cacheStorage.GetOrAdd<int>(cacheKey, valueFactory, TimeSpan.FromMinutes(1));
+        var result = cacheStorage.GetOrAdd(cacheKey, ValueFactory, TimeSpan.FromMinutes(1));
 
         // Assert
-        result.Should().Be(cachedValue);
-        valueFactoredCalled.Should().BeFalse();
+        Assert.Equal(cachedValue, result);
+        Assert.False(valueFactoredCalled);
     }
 
-    [Test]
+    [Fact]
     public void GetOrAdd_WhenItemDoesNotExist_CreateAndReturnNew()
     {
         // Arrange
@@ -72,17 +70,17 @@ public sealed class CacheStorageTests
 
         const int valueFactoryResult = cachedValue + 1;
         var valueFactoredCalled = false;
-        Func<int> valueFactory = () =>
+        int ValueFactory()
         {
             valueFactoredCalled = true;
             return valueFactoryResult;
-        };
+        }
 
         // Act 
-        var result = cacheStorage.GetOrAdd<int>(cacheKey, valueFactory, TimeSpan.FromMinutes(1));
+        var result = cacheStorage.GetOrAdd(cacheKey, ValueFactory, TimeSpan.FromMinutes(1));
 
         // Assert
-        result.Should().Be(valueFactoryResult);
-        valueFactoredCalled.Should().BeTrue();
+        Assert.Equal(valueFactoryResult, result);
+        Assert.True(valueFactoredCalled);
     }
 }

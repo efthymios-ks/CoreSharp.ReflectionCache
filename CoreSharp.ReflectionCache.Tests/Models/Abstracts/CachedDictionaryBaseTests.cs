@@ -1,15 +1,12 @@
 ﻿using CoreSharp.ReflectionCache.Models.Abstracts;
-using FluentAssertions;
-using NUnit.Framework;
 using System.Collections;
 using System.Reflection;
 
-namespace Tests.Models.Abstracts;
+namespace CoreSharp.ReflectionCache.Tests.Models.Abstracts;
 
-[TestFixture]
 public sealed class CachedDictionaryBaseTests
 {
-    [Test]
+    [Fact]
     public void Constructor_WhenSourceIsNotNull_ShouldBeInitializedFromSource()
     {
         // Arrange
@@ -24,23 +21,25 @@ public sealed class CachedDictionaryBaseTests
         var cachedDictionary = new DummyCachedDictionary(source);
 
         // Assert
-        cachedDictionary.Should().BeEquivalentTo(source);
+        Assert.Equivalent(source, cachedDictionary);
     }
 
-    [Test]
+    [Fact]
     public void Constructor_WhenSourceIsNull_ShouldNotThrow()
     {
         // Arrange
         IReadOnlyDictionary<string, string>? source = null;
 
         // Act
-        Action action = () => _ = new DummyCachedDictionary(source);
+        void Action()
+            => _ = new DummyCachedDictionary(source);
 
         // Assert
-        action.Should().NotThrow();
+        var exception = Record.Exception(Action);
+        Assert.Null(exception);
     }
 
-    [Test]
+    [Fact]
     public void Constructor_WhenSourceIsNull_ShouldBeInitializedAsEmpty()
     {
         // Arrange
@@ -50,11 +49,11 @@ public sealed class CachedDictionaryBaseTests
         var cachedDictionary = new DummyCachedDictionary(source);
 
         // Assert
-        cachedDictionary.Should().NotBeNull();
-        cachedDictionary.Should().BeEmpty();
+        Assert.NotNull(cachedDictionary);
+        Assert.Empty(cachedDictionary);
     }
 
-    [Test]
+    [Fact]
     public void DebuggerDisplay_WhenCalled_ShouldReturnCount()
     {
         // Arrange
@@ -74,10 +73,10 @@ public sealed class CachedDictionaryBaseTests
            ?.GetValue(cachedDictionary) as string;
 
         // Assert
-        debuggerDisplay.Should().Be("Count=3");
+        Assert.Equal("Count=3", debuggerDisplay);
     }
 
-    [Test]
+    [Fact]
     public void Indexer_WhenCalled_ShouldReturnCorrectValue()
     {
         // Arrange
@@ -93,10 +92,10 @@ public sealed class CachedDictionaryBaseTests
         var value = cachedDictionary["Two"];
 
         // Assert
-        value.Should().Be("2");
+        Assert.Equal("2", value);
     }
 
-    [Test]
+    [Fact]
     public void Keys_WhenCalled_ShouldReturnKeys()
     {
         // Arrange
@@ -112,10 +111,10 @@ public sealed class CachedDictionaryBaseTests
         var keys = cachedDictionary.Keys;
 
         // Assert
-        keys.Should().BeEquivalentTo(source.Keys);
+        Assert.Equivalent(source.Keys, keys);
     }
 
-    [Test]
+    [Fact]
     public void Values_WhenCalled_ShouldReturnValues()
     {
         // Arrange
@@ -131,10 +130,10 @@ public sealed class CachedDictionaryBaseTests
         var values = cachedDictionary.Values;
 
         // Assert
-        values.Should().BeEquivalentTo(source.Values);
+        Assert.Equivalent(source.Values, values);
     }
 
-    [Test]
+    [Fact]
     public void Count_WhenCalled_ShouldReturnItemsCount()
     {
         // Arrange
@@ -150,10 +149,10 @@ public sealed class CachedDictionaryBaseTests
         var count = cachedDictionary.Count;
 
         // Assert
-        count.Should().Be(source.Count);
+        Assert.Equal(source.Count, count);
     }
 
-    [Test]
+    [Fact]
     public void ContainsKey_WhenKeyExists_ShouldReturnTrue()
     {
         // Arrange
@@ -169,10 +168,10 @@ public sealed class CachedDictionaryBaseTests
         var exists = cachedDictionary.ContainsKey("Two");
 
         // Assert
-        exists.Should().BeTrue();
+        Assert.True(exists);
     }
 
-    [Test]
+    [Fact]
     public void ContainsKey_WhenKeyDoesNotExist_ShouldReturnFalse()
     {
         // Arrange
@@ -188,10 +187,10 @@ public sealed class CachedDictionaryBaseTests
         var exists = cachedDictionary.ContainsKey("Four");
 
         // Assert
-        exists.Should().BeFalse();
+        Assert.False(exists);
     }
 
-    [Test]
+    [Fact]
     public void TryGetValue_WhenKeyExists_ShouldReturnTrueAndValue()
     {
         // Arrange
@@ -207,11 +206,11 @@ public sealed class CachedDictionaryBaseTests
         var exists = cachedDictionary.TryGetValue("Two", out var value);
 
         // Assert
-        exists.Should().BeTrue();
-        value.Should().Be("2");
+        Assert.True(exists);
+        Assert.Equal("2", value);
     }
 
-    [Test]
+    [Fact]
     public void TryGetValue_WhenKeyDoesNotExist_ShouldReturnFalseAndDefault()
     {
         // Arrange
@@ -227,11 +226,11 @@ public sealed class CachedDictionaryBaseTests
         var exists = cachedDictionary.TryGetValue("Four", out var value);
 
         // Assert
-        exists.Should().BeFalse();
-        value.Should().BeNull();
+        Assert.False(exists);
+        Assert.Null(value);
     }
 
-    [Test]
+    [Fact]
     public void GetEnumerator_Generic_WhenCalled_ShouldReturnItemsEnumerator()
     {
         // Arrange
@@ -252,11 +251,11 @@ public sealed class CachedDictionaryBaseTests
         }
 
         // Assert 
-        enumerator.Should().NotBeNull();
-        enumeratedItems.Should().BeEquivalentTo(source);
+        Assert.NotNull(enumerator);
+        Assert.Equivalent(source, enumeratedItems);
     }
 
-    [Test]
+    [Fact]
     public void GetEnumerator_WhenCalled_ShouldReturnItemsEnumerator()
     {
         // Arrange
@@ -277,8 +276,8 @@ public sealed class CachedDictionaryBaseTests
         }
 
         // Assert 
-        enumerator.Should().NotBeNull();
-        enumeratedItems.Should().BeEquivalentTo(source);
+        Assert.NotNull(enumerator);
+        Assert.Equivalent(source, enumeratedItems);
     }
 
     private sealed class DummyCachedDictionary(IReadOnlyDictionary<string, string>? source)

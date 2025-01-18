@@ -1,28 +1,25 @@
 ﻿using CoreSharp.ReflectionCache.Models;
-using FluentAssertions;
-using NSubstitute;
-using NUnit.Framework;
 using System.Reflection;
 
-namespace Tests.Models;
+namespace CoreSharp.ReflectionCache.Tests.Models;
 
-[TestFixture]
-public class CachedPropertyTests
+public sealed class CachedPropertyTests
 {
-    [Test]
+    [Fact]
     public void Constructor_WhenPropertyInfoIsNull_ShouldThrowArgumentNullException()
     {
         // Arrange
         PropertyInfo? propertyInfo = null;
 
         // Act
-        Action action = () => _ = new CachedProperty(propertyInfo);
+        void Action()
+            => _ = new CachedProperty(propertyInfo);
 
         // Assert
-        action.Should().ThrowExactly<ArgumentNullException>();
+        Assert.Throws<ArgumentNullException>(Action);
     }
 
-    [Test]
+    [Fact]
     public void Constructor_WhenPropertyInfoIsNotNull_ShouldNotThrowException()
     {
         // Arrange
@@ -30,13 +27,15 @@ public class CachedPropertyTests
             .GetProperty(nameof(DummyClass.Property));
 
         // Act
-        Action action = () => _ = new CachedProperty(propertyInfo);
+        void Action()
+            => _ = new CachedProperty(propertyInfo);
 
         // Assert
-        action.Should().NotThrow();
+        var exception = Record.Exception(Action);
+        Assert.Null(exception);
     }
 
-    [Test]
+    [Fact]
     public void Type_WhenCalled_ShouldReturnFieldType()
     {
         // Arrange
@@ -49,11 +48,11 @@ public class CachedPropertyTests
         var propertyType = cachedProperty.Type;
 
         // Assert
-        propertyType.Should().NotBeNull();
-        propertyType.Should().Be(typeof(string));
+        Assert.NotNull(propertyType);
+        Assert.Equal(typeof(string), propertyType);
     }
 
-    [Test]
+    [Fact]
     public void CanWrite_WhenPropertyIsReadOnly_ShouldReturnFalse()
     {
         // Arrange
@@ -65,10 +64,10 @@ public class CachedPropertyTests
         var canWrite = cachedProperty.CanWrite;
 
         // Assert
-        canWrite.Should().BeFalse();
+        Assert.False(canWrite);
     }
 
-    [Test]
+    [Fact]
     public void CanWrite_WhenFieldIsWritable_ShouldReturnTrue()
     {
         // Arrange
@@ -80,10 +79,10 @@ public class CachedPropertyTests
         var canWrite = cachedProperty.CanWrite;
 
         // Assert
-        canWrite.Should().BeTrue();
+        Assert.True(canWrite);
     }
 
-    [Test]
+    [Fact]
     public void CanRead_WhenPropertyIsWriteOnly_ShouldReturnFalse()
     {
         // Arrange
@@ -92,13 +91,13 @@ public class CachedPropertyTests
         var cachedProperty = new CachedProperty(propertyInfo);
 
         // Act
-        var canWrite = cachedProperty.CanRead;
+        var canRead = cachedProperty.CanRead;
 
         // Assert
-        canWrite.Should().BeFalse();
+        Assert.False(canRead);
     }
 
-    [Test]
+    [Fact]
     public void CanRead_WhenFieldIsReadable_ShouldReturnTrue()
     {
         // Arrange
@@ -107,13 +106,13 @@ public class CachedPropertyTests
         var cachedProperty = new CachedProperty(propertyInfo);
 
         // Act
-        var canWrite = cachedProperty.CanRead;
+        var canRead = cachedProperty.CanRead;
 
         // Assert
-        canWrite.Should().BeTrue();
+        Assert.True(canRead);
     }
 
-    [Test]
+    [Fact]
     public void GetValue_WhenCalled_ShouldReturnFieldValue()
     {
         // Arrange 
@@ -129,11 +128,11 @@ public class CachedPropertyTests
         var valueRead = cachedProperty.GetValue(parent);
 
         // Assert
-        valueRead.Should().NotBeNull();
-        valueRead.Should().Be(parent.Property);
+        Assert.NotNull(valueRead);
+        Assert.Equal(parent.Property, valueRead);
     }
 
-    [Test]
+    [Fact]
     public void GetValue_WhenGetterIsNotPublic_ShouldReturnPrivateGetter()
     {
         // Arrange
@@ -146,21 +145,19 @@ public class CachedPropertyTests
             .Returns(getterMethodInfoMock);
 
         // Act 
-        Action action = () => _ = cachedProperty.GetValue(new object());
+        void Action()
+            => _ = cachedProperty.GetValue(new object());
 
         // Assert 
-        // Could not find any other way to mock MethodInfo.
-        // So I just ignore the error that follows after my test case.
-        action.Should()
-            .ThrowExactly<ArgumentException>()
-            .WithMessage("MethodInfo must be a runtime MethodInfo object. (Parameter 'method')");
+        var exception = Assert.Throws<ArgumentException>(Action);
+        Assert.Equal("MethodInfo must be a runtime MethodInfo object. (Parameter 'method')", exception.Message);
 
         propertyInfo
           .GetGetMethod(true)
           .Received(1);
     }
 
-    [Test]
+    [Fact]
     public void GetValue_WhenNoGetterIsFound_ShouldThrowInvalidOperationException()
     {
         // Arrange
@@ -177,13 +174,14 @@ public class CachedPropertyTests
             .Returns(nameof(DummyClass.Property));
 
         // Act 
-        Action action = () => _ = cachedProperty.GetValue(parent);
+        void Action()
+            => _ = cachedProperty.GetValue(parent);
 
         // Assert 
-        action.Should().ThrowExactly<InvalidOperationException>();
+        Assert.Throws<InvalidOperationException>(Action);
     }
 
-    [Test]
+    [Fact]
     public void SetValue_WhenCalled_ShouldSetValue()
     {
         // Arrange 
@@ -197,10 +195,10 @@ public class CachedPropertyTests
         cacheProperty.SetValue(parent, valueToSet);
 
         // Assert 
-        parent.Property.Should().Be(valueToSet);
+        Assert.Equal(valueToSet, parent.Property);
     }
 
-    [Test]
+    [Fact]
     public void SetValue_WhenGetterIsNotPublic_ShouldReturnPrivateGetter()
     {
         // Arrange
@@ -213,21 +211,19 @@ public class CachedPropertyTests
             .Returns(getterMethodInfoMock);
 
         // Act 
-        Action action = () => cachedProperty.SetValue(new object(), "");
+        void Action()
+            => cachedProperty.SetValue(new object(), "");
 
         // Assert 
-        // Could not find any other way to mock MethodInfo.
-        // So I just ignore the error that follows after my test case.
-        action.Should()
-            .ThrowExactly<ArgumentException>()
-            .WithMessage("MethodInfo must be a runtime MethodInfo object. (Parameter 'method')");
+        var exception = Assert.Throws<ArgumentException>(Action);
+        Assert.Equal("MethodInfo must be a runtime MethodInfo object. (Parameter 'method')", exception.Message);
 
         propertyInfo
           .GetSetMethod(true)
           .Received(1);
     }
 
-    [Test]
+    [Fact]
     public void SetValue_WhenNoGetterIsFound_ShouldThrowInvalidOperationException()
     {
         // Arrange
@@ -244,10 +240,11 @@ public class CachedPropertyTests
             .Returns(nameof(DummyClass.Property));
 
         // Act 
-        Action action = () => cachedProperty.SetValue(parent, "");
+        void Action()
+            => cachedProperty.SetValue(parent, "");
 
         // Assert 
-        action.Should().ThrowExactly<InvalidOperationException>();
+        Assert.Throws<InvalidOperationException>(Action);
     }
 
     private sealed class DummyClass

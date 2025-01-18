@@ -1,27 +1,25 @@
 ﻿using CoreSharp.ReflectionCache.Models;
-using FluentAssertions;
-using NUnit.Framework;
 using System.Reflection;
 
-namespace Tests.Models;
+namespace CoreSharp.ReflectionCache.Tests.Models;
 
-[TestFixture]
 public sealed class CachedMethodTests
 {
-    [Test]
+    [Fact]
     public void Constructor_WhenMethodInfoIsNull_ShouldThrowArgumentNullException()
     {
         // Arrange
         MethodInfo? methodInfo = null;
 
         // Act
-        Action action = () => _ = new CachedMethod(methodInfo);
+        void Action()
+            => _ = new CachedMethod(methodInfo);
 
         // Assert
-        action.Should().ThrowExactly<ArgumentNullException>();
+        Assert.Throws<ArgumentNullException>(Action);
     }
 
-    [Test]
+    [Fact]
     public void Constructor_WhenConstructorInfoIsNotNull_ShouldNotThrowException()
     {
         // Arrange
@@ -29,13 +27,15 @@ public sealed class CachedMethodTests
             .GetMethod(nameof(DummyClass.Process));
 
         // Act
-        Action action = () => _ = new CachedMethod(methodInfo);
+        void Action()
+            => _ = new CachedMethod(methodInfo);
 
         // Assert
-        action.Should().NotThrow();
+        var exception = Record.Exception(Action);
+        Assert.Null(exception);
     }
 
-    [Test]
+    [Fact]
     public void ReturnType_WhenCalled_ShouldReturnMethodInfoReturnType()
     {
         // Arrange
@@ -47,10 +47,10 @@ public sealed class CachedMethodTests
         var returnType = cachedMethod.ReturnType;
 
         // Assert
-        returnType.Should().Be(typeof(string));
+        Assert.Equal(typeof(string), returnType);
     }
 
-    [Test]
+    [Fact]
     public void Parameters_WhenCalled_ShouldReturnParameterInfoArray()
     {
         // Arrange
@@ -62,13 +62,13 @@ public sealed class CachedMethodTests
         var parameters = cachedMethod.Parameters;
 
         // Assert
-        parameters.Should().NotBeNull();
-        parameters.Should().HaveCount(1);
+        Assert.NotNull(parameters);
+        Assert.Single(parameters);
         var parameter = parameters[0];
-        parameter.ParameterType.Should().Be(typeof(int));
+        Assert.Equal(typeof(int), parameter.ParameterType);
     }
 
-    [Test]
+    [Fact]
     public void Invoke_Generic_WhenCalled_ShouldInvokeConstructor()
     {
         // Arrange
@@ -80,10 +80,10 @@ public sealed class CachedMethodTests
         var result = cachedMethod.Invoke<string>(parent: null, 1);
 
         // Assert 
-        result.Should().Be("1");
+        Assert.Equal("1", result);
     }
 
-    [Test]
+    [Fact]
     public void Invoke_WhenCalled_ShouldInvokeConstructor()
     {
         // Arrange
@@ -95,8 +95,8 @@ public sealed class CachedMethodTests
         var result = cachedMethod.Invoke(parent: null, 1);
 
         // Assert
-        var resultAsString = result.Should().BeOfType<string>().Subject;
-        resultAsString.Should().Be("1");
+        var resultAsString = Assert.IsType<string>(result);
+        Assert.Equal("1", resultAsString);
     }
 
     private static class DummyClass

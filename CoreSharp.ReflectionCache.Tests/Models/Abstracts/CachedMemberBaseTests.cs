@@ -1,28 +1,26 @@
 ﻿using CoreSharp.ReflectionCache.Models.Abstracts;
-using FluentAssertions;
-using NUnit.Framework;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
-namespace Tests.Models.Abstracts;
+namespace CoreSharp.ReflectionCache.Tests.Models.Abstracts;
 
-[TestFixture]
 public sealed class CachedMemberBaseTests
 {
-    [Test]
+    [Fact]
     public void Constructor_WhenMemberInfoIsNull_ShouldThrowArgumentNullException()
     {
         // Arrange
         MemberInfo? memberInfo = null;
 
         // Act
-        Action action = () => _ = new DummyCachedMember(memberInfo);
+        void Action()
+            => _ = new DummyCachedMember(memberInfo);
 
         // Assert
-        action.Should().ThrowExactly<ArgumentNullException>();
+        Assert.Throws<ArgumentNullException>(Action);
     }
 
-    [Test]
+    [Fact]
     public void DebuggerDisplay_WhenCalled_ShouldReturnName()
     {
         // Arrange
@@ -38,10 +36,10 @@ public sealed class CachedMemberBaseTests
            ?.GetValue(cachedMember) as string;
 
         // Assert
-        debuggerDisplay.Should().Be(nameof(DummyClass.Property1));
+        Assert.Equal(nameof(DummyClass.Property1), debuggerDisplay);
     }
 
-    [Test]
+    [Fact]
     public void MemberInfo_WhenCalled_ShouldReturnCorrectValue()
     {
         // Arrange
@@ -56,10 +54,10 @@ public sealed class CachedMemberBaseTests
             ?.GetValue(cachedMember) as PropertyInfo;
 
         // Assert
-        memberInfoRead.Should().BeSameAs(memberInfo);
+        Assert.Same(memberInfo, memberInfoRead);
     }
 
-    [Test]
+    [Fact]
     public void Name_WhenCalled_ShouldReturnCorrectValue()
     {
         // Arrange
@@ -71,10 +69,10 @@ public sealed class CachedMemberBaseTests
         var name = cachedMember.Name;
 
         // Assert
-        name.Should().Be(nameof(DummyClass.Property1));
+        Assert.Equal(nameof(DummyClass.Property1), name);
     }
 
-    [Test]
+    [Fact]
     public void Attributes_WhenCalled_ShouldReturnCorrectValue()
     {
         // Arrange
@@ -86,10 +84,10 @@ public sealed class CachedMemberBaseTests
         var attributes = cachedMember.Attributes;
 
         // Assert
-        attributes.Should().NotBeNull();
-        attributes.Should().HaveCount(1);
-        var displayAttribute = attributes.First().Should().BeOfType<DisplayAttribute>().Subject;
-        displayAttribute.Name.Should().Be("Property1_Display");
+        Assert.NotNull(attributes);
+        Assert.Single(attributes);
+        var displayAttribute = Assert.IsType<DisplayAttribute>(attributes.First());
+        Assert.Equal("Property1_Display", displayAttribute.Name);
     }
 
     private class DummyCachedMember(MemberInfo? memberInfo)

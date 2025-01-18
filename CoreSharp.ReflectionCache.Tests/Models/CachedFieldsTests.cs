@@ -1,26 +1,25 @@
 ﻿using CoreSharp.ReflectionCache.Models;
-using FluentAssertions;
-using NUnit.Framework;
 
-namespace Tests.Models;
+namespace CoreSharp.ReflectionCache.Tests.Models;
 
-[TestFixture]
 public sealed class CachedFieldsTests
 {
-    [Test]
+    [Fact]
     public void Constructor_WhenTypeIsNull_ShouldNotThrowException()
     {
         // Arrange
         Type? type = null;
 
         // Act
-        Action action = () => _ = new CachedFields(type);
+        void Action()
+            => _ = new CachedFields(type);
 
         // Assert
-        action.Should().NotThrow();
+        var exception = Record.Exception(Action);
+        Assert.Null(exception);
     }
 
-    [Test]
+    [Fact]
     public void Constructor_WhenTypeIsNull_ShouldInitializeAsEmpty()
     {
         // Arrange
@@ -30,11 +29,11 @@ public sealed class CachedFieldsTests
         var cachedFields = new CachedFields(type);
 
         // Assert
-        cachedFields.Should().NotBeNull();
-        cachedFields.Should().BeEmpty();
+        Assert.NotNull(cachedFields);
+        Assert.Empty(cachedFields);
     }
 
-    [Test]
+    [Fact]
     public void Constructor_WhenCalled_ShouldInitializeFields()
     {
         // Arrange
@@ -44,10 +43,10 @@ public sealed class CachedFieldsTests
         var cachedFields = new CachedFields(type);
 
         // Assert
-        cachedFields.Should().NotBeNull();
-        cachedFields.Should().HaveCount(1);
-        cachedFields.Should().NotContainKey(nameof(DummyClass.Property1));
-        cachedFields.Should().ContainKey(nameof(DummyClass.Field1));
+        Assert.NotNull(cachedFields);
+        Assert.Single(cachedFields);
+        Assert.DoesNotContain(nameof(DummyClass.Property1), cachedFields.Keys);
+        Assert.Contains(nameof(DummyClass.Field1), cachedFields.Keys);
     }
 
     private sealed class DummyClass

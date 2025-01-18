@@ -1,38 +1,36 @@
 ﻿using CoreSharp.ReflectionCache.Models;
-using FluentAssertions;
-using NUnit.Framework;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
-namespace Tests.Models;
+namespace CoreSharp.ReflectionCache.Tests.Models;
 
-[TestFixture]
 public sealed class CachedTypeTests
 {
-    [Test]
+    [Fact]
     public void Get_Generic_WhenCalled_ShouldReturnCachedType()
     {
         // Act 
         var cachedType = CachedType.Get<DummyClass>();
 
         // Assert
-        cachedType.Should().NotBeNull();
+        Assert.NotNull(cachedType);
     }
 
-    [Test]
+    [Fact]
     public void Get_WhenTypeIsNull_ShouldThrowArgumentNullException()
     {
         // Arrange
         Type? type = null!;
 
         // Act 
-        Action action = () => _ = CachedType.Get(type);
+        void Action()
+            => _ = CachedType.Get(type);
 
         // Assert
-        action.Should().ThrowExactly<ArgumentNullException>();
+        Assert.Throws<ArgumentNullException>(Action);
     }
 
-    [Test]
+    [Fact]
     public void Get_WhenCalled_ShouldReturnCachedType()
     {
         // Arrange
@@ -42,47 +40,49 @@ public sealed class CachedTypeTests
         var cachedType = CachedType.Get(type);
 
         // Assert
-        cachedType.Should().NotBeNull();
+        Assert.NotNull(cachedType);
     }
 
-    [Test]
+    [Fact]
     public void Get_Generic_WhenCalledWithCacheDuration_ShouldReturnCachedType()
     {
         // Act 
         var cachedType = CachedType.Get<DummyClass>(TimeSpan.FromTicks(1));
 
         // Assert
-        cachedType.Should().NotBeNull();
+        Assert.NotNull(cachedType);
     }
 
-    [Test]
+    [Fact]
     public void Get_WhenCalledWithDurationAndTypeIsNull_ShouldThrowArgumentNullException()
     {
         // Arrange
         Type? type = null!;
 
         // Act 
-        Action action = () => _ = CachedType.Get(type, TimeSpan.FromTicks(1));
+        void Action()
+            => _ = CachedType.Get(type, TimeSpan.FromTicks(1));
 
         // Assert
-        action.Should().ThrowExactly<ArgumentNullException>();
+        Assert.Throws<ArgumentNullException>(Action);
     }
 
-    [Test]
+    [Fact]
     public void Get_WhenCalledWithDurationAndNotExpired_ShouldReturnSameInstance()
     {
         // Arrange
-        var duration = TimeSpan.FromMinutes(1);
+        const int durationMinutes = 1;
+        var duration = TimeSpan.FromMinutes(durationMinutes);
         var firstCachedType = CachedType.Get<DummyClass>(duration);
 
         // Act 
         var secondCachedType = CachedType.Get<DummyClass>(duration);
 
         // Assert 
-        secondCachedType.Should().BeSameAs(firstCachedType);
+        Assert.Same(firstCachedType, secondCachedType);
     }
 
-    [Test]
+    [Fact]
     public void DebuggerDisplay_WhenCalled_ShouldReturnTypeFullName()
     {
         // Arrange
@@ -95,10 +95,10 @@ public sealed class CachedTypeTests
             ?.GetValue(cachedType);
 
         // Assert
-        debuggerDisplay.Should().Be(typeof(DummyClass).FullName);
+        Assert.Equal(typeof(DummyClass).FullName, debuggerDisplay);
     }
 
-    [Test]
+    [Fact]
     public void BaseType_WhenCalled_ShouldReturnType()
     {
         // Arrange
@@ -108,10 +108,10 @@ public sealed class CachedTypeTests
         var baseType = cachedType.BaseType;
 
         // Assert
-        baseType.Should().Be(typeof(DummyClass));
+        Assert.Equal(typeof(DummyClass), baseType);
     }
 
-    [Test]
+    [Fact]
     public void FullName_WhenCalled_ShouldReturnFullName()
     {
         // Arrange
@@ -121,10 +121,10 @@ public sealed class CachedTypeTests
         var fullName = cachedType.FullName;
 
         // Assert
-        fullName.Should().Be(typeof(DummyClass).FullName);
+        Assert.Equal(typeof(DummyClass).FullName, fullName);
     }
 
-    [Test]
+    [Fact]
     public void Name_WhenCalled_ShouldReturnName()
     {
         // Arrange
@@ -134,10 +134,10 @@ public sealed class CachedTypeTests
         var name = cachedType.Name;
 
         // Assert
-        name.Should().Be(nameof(DummyClass));
+        Assert.Equal(nameof(DummyClass), name);
     }
 
-    [Test]
+    [Fact]
     public void Constructors_WhenCalled_ShouldReturnCachedConstructors()
     {
         // Arrange
@@ -147,17 +147,17 @@ public sealed class CachedTypeTests
         var constructors = cachedType.Constructors;
 
         // Assert
-        constructors.Should().NotBeNull();
-        constructors.Should().HaveCount(1);
+        Assert.NotNull(constructors);
+        Assert.Single(constructors);
         var constructor = constructors.First();
         var parameters = constructor.Parameters;
-        constructors.Should().NotBeNull();
-        constructors.Should().HaveCount(1);
+        Assert.NotNull(parameters);
+        Assert.Single(parameters);
         var parameter = parameters[0];
-        parameter.ParameterType.Should().Be(typeof(int));
+        Assert.Equal(typeof(int), parameter.ParameterType);
     }
 
-    [Test]
+    [Fact]
     public void Attributes_WhenCalled_ShouldReturnCachedAttributes()
     {
         // Arrange
@@ -167,14 +167,14 @@ public sealed class CachedTypeTests
         var attributes = cachedType.Attributes;
 
         // Assert
-        attributes.Should().NotBeNull();
-        attributes.Should().HaveCountGreaterThan(0);
+        Assert.NotNull(attributes);
+        Assert.NotEmpty(attributes);
         var displayAttribute = attributes.FirstOrDefault(attribute => attribute is DisplayAttribute) as DisplayAttribute;
-        displayAttribute.Should().NotBeNull();
-        displayAttribute!.Name.Should().Be("DummyClass_Display");
+        Assert.NotNull(displayAttribute);
+        Assert.Equal("DummyClass_Display", displayAttribute!.Name);
     }
 
-    [Test]
+    [Fact]
     public void Properties_WhenCalled_ShouldReturnCachedProperties()
     {
         // Arrange
@@ -184,13 +184,13 @@ public sealed class CachedTypeTests
         var properties = cachedType.Properties;
 
         // Assert
-        properties.Should().NotBeNull();
-        properties.Should().HaveCount(1);
-        properties.Should().NotContainKey(nameof(DummyClass.Field));
-        properties.Should().ContainKey(nameof(DummyClass.Property));
+        Assert.NotNull(properties);
+        Assert.Single(properties);
+        Assert.DoesNotContain(nameof(DummyClass.Field), properties.Keys);
+        Assert.Contains(nameof(DummyClass.Property), properties.Keys);
     }
 
-    [Test]
+    [Fact]
     public void Fields_WhenCalled_ShouldReturnCachedFields()
     {
         // Arrange
@@ -200,13 +200,13 @@ public sealed class CachedTypeTests
         var fields = cachedType.Fields;
 
         // Assert
-        fields.Should().NotBeNull();
-        fields.Should().HaveCount(1);
-        fields.Should().NotContainKey(nameof(DummyClass.Property));
-        fields.Should().ContainKey(nameof(DummyClass.Field));
+        Assert.NotNull(fields);
+        Assert.Single(fields);
+        Assert.DoesNotContain(nameof(DummyClass.Property), fields.Keys);
+        Assert.Contains(nameof(DummyClass.Field), fields.Keys);
     }
 
-    [Test]
+    [Fact]
     public void Methods_WhenCalled_ShouldReturnCachedMethods()
     {
         // Arrange
@@ -216,19 +216,19 @@ public sealed class CachedTypeTests
         var methods = cachedType.Methods;
 
         // Assert
-        methods.Should().NotBeNull();
-        methods.Should().NotBeEmpty();
+        Assert.NotNull(methods);
+        Assert.NotEmpty(methods);
 
         var processMethod = methods.FirstOrDefault(method => method.Name == nameof(DummyClass.Process))!;
-        processMethod.Should().NotBeNull();
-        processMethod.ReturnType.Should().Be(typeof(string));
-        processMethod.Name.Should().Be(nameof(DummyClass.Process));
+        Assert.NotNull(processMethod);
+        Assert.Equal(typeof(string), processMethod.ReturnType);
+        Assert.Equal(nameof(DummyClass.Process), processMethod.Name);
 
         var parameters = processMethod.Parameters;
-        parameters.Should().NotBeNull();
-        parameters.Should().HaveCount(1);
+        Assert.NotNull(parameters);
+        Assert.Single(parameters);
         var parameter = parameters[0];
-        parameter.ParameterType.Should().Be(typeof(int));
+        Assert.Equal(typeof(int), parameter.ParameterType);
     }
 
     [Display(Name = "DummyClass_Display")]

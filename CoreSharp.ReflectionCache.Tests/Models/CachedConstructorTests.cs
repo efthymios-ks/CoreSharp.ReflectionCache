@@ -1,27 +1,25 @@
 ﻿using CoreSharp.ReflectionCache.Models;
-using FluentAssertions;
-using NUnit.Framework;
 using System.Reflection;
 
-namespace Tests.Models;
+namespace CoreSharp.ReflectionCache.Tests.Models;
 
-[TestFixture]
 public sealed class CachedConstructorTests
 {
-    [Test]
+    [Fact]
     public void Constructor_WhenConstructorInfoIsNull_ShouldThrowArgumentNullException()
     {
         // Arrange
         ConstructorInfo? constructorInfo = null;
 
         // Act
-        Action action = () => _ = new CachedConstructor(constructorInfo);
+        void Action()
+            => _ = new CachedConstructor(constructorInfo);
 
         // Assert
-        action.Should().ThrowExactly<ArgumentNullException>();
+        Assert.Throws<ArgumentNullException>(Action);
     }
 
-    [Test]
+    [Fact]
     public void Constructor_WhenConstructorInfoIsNotNull_ShouldNotThrowException()
     {
         // Arrange
@@ -29,13 +27,15 @@ public sealed class CachedConstructorTests
             .GetConstructors()[0];
 
         // Act
-        Action action = () => _ = new CachedConstructor(constructorInfo);
+        void Action()
+            => _ = new CachedConstructor(constructorInfo);
 
         // Assert
-        action.Should().NotThrow();
+        var exception = Record.Exception(Action);
+        Assert.Null(exception);
     }
 
-    [Test]
+    [Fact]
     public void Parameters_WhenCalled_ShouldReturnParameterInfoArray()
     {
         // Arrange
@@ -47,13 +47,13 @@ public sealed class CachedConstructorTests
         var parameters = cachedConstructor.Parameters;
 
         // Assert
-        parameters.Should().NotBeNull();
-        parameters.Should().HaveCount(1);
+        Assert.NotNull(parameters);
+        Assert.Equal(1, parameters.Length);
         var parameter = parameters[0];
-        parameter.ParameterType.Should().Be(typeof(int));
+        Assert.Equal(typeof(int), parameter.ParameterType);
     }
 
-    [Test]
+    [Fact]
     public void Invoke_Generic_WhenCalled_ShouldInvokeConstructor()
     {
         // Arrange
@@ -65,11 +65,11 @@ public sealed class CachedConstructorTests
         var dummyClass = cachedConstructor.Invoke<DummyClass>(1);
 
         // Assert
-        dummyClass.Should().NotBeNull();
-        dummyClass.Value.Should().Be(1);
+        Assert.NotNull(dummyClass);
+        Assert.Equal(1, dummyClass.Value);
     }
 
-    [Test]
+    [Fact]
     public void Invoke_WhenCalled_ShouldInvokeConstructor()
     {
         // Arrange
@@ -81,9 +81,9 @@ public sealed class CachedConstructorTests
         var dummyClassAsObject = cachedConstructor.Invoke(1);
 
         // Assert
-        dummyClassAsObject.Should().NotBeNull();
-        var dummyClass = dummyClassAsObject.Should().BeOfType<DummyClass>().Subject;
-        dummyClass.Value.Should().Be(1);
+        Assert.NotNull(dummyClassAsObject);
+        var dummyClass = Assert.IsType<DummyClass>(dummyClassAsObject);
+        Assert.Equal(1, dummyClass.Value);
     }
 
     private sealed class DummyClass(int value)
